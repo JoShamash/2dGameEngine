@@ -1,0 +1,160 @@
+﻿#define SDL_MAIN_HANDLED
+#include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
+#include <SDL2_mixer/SDL_mixer.h>
+#include <SDL2_ttf/SDL_ttf.h>
+#include <iostream>
+
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+
+int main() {
+    // 初始化SDL（视频和音频子系统）
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+        std::cerr << "SDL初始化失败: " << SDL_GetError() << std::endl;
+        return -1;
+    }
+
+    // 设置缩放质量（此处"1"表示线性过滤，效果较平滑；若需要像素级清晰效果可设置为"0"）
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
+    // 创建支持调整大小的窗口
+    SDL_Window* window = SDL_CreateWindow(u8"SDL测试",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    if (!window) {
+        std::cerr << "窗口创建失败: " << SDL_GetError() << std::endl;
+        SDL_Quit();
+        return -1;
+    }
+
+    // 创建渲染器
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        std::cerr << "渲染器创建失败: " << SDL_GetError() << std::endl;
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
+    // 设置固定逻辑尺寸，内容会自动按窗口大小缩放
+    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // 加载图片（SDL_image）
+    SDL_Texture* imageTexture = nullptr;
+    int imgFlags = IMG_INIT_PNG;
+    if (!(IMG_Init(imgFlags) & imgFlags)) {
+        std::cerr << "SDL_image初始化失败: " << IMG_GetError() << std::endl;
+    }
+    else {
+        imageTexture = IMG_LoadTexture(renderer, "test.png");
+        if (!imageTexture) {
+            std::cerr << "图片加载失败: " << IMG_GetError() << std::endl;
+        }
+    }
+
+    // 加载字体并生成文字纹理（SDL_ttf）
+    SDL_Texture* textTexture = nullptr;
+    if (TTF_Init() == -1) {
+        std::cerr << "SDL_ttf初始化失败: " << TTF_GetError() << std::endl;
+    }
+    else {
+        // 确保使用的字体文件支持中文字符
+        TTF_Font* font = TTF_OpenFont(u8"阿里巴巴普惠体 M.ttf", 24);
+        if (!font) {
+            std::cerr << "字体加载失败: " << TTF_GetError() << std::endl;
+        }
+        else {
+            SDL_Color color = { 255, 255, 255 }; // 白色
+            SDL_Surface* textSurface = TTF_RenderUTF8_Solid(font, u8"阿里巴巴普惠体", color);
+            if (textSurface) {
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+            }
+            else {
+                std::cerr << "文字渲染失败: " << TTF_GetError() << std::endl;
+            }
+            TTF_CloseFont(font);
+        }
+        TTF_Quit();
+    }
+
+    // 初始化SDL_mixer并播放MP3
+    int mixFlags = MIX_INIT_MP3;
+    if ((Mix_Init(mixFlags) & mixFlags) != mixFlags) {
+        std::cerr << "Mixer初始化失败: " << Mix_GetError() << std::endl;
+    }
+    if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 4096) != 0) {
+        std::cerr << "音频设备初始化失败: " << Mix_GetError() << std::endl;
+    }
+    Mix_Music* music = Mix_LoadMUS(u8"白ユキ-Milkoi.Miraie#2mERhX.mp3");
+    if (!music) {
+        std::cerr << "无法加载MP3: " << Mix_GetError() << std::endl;
+    }
+    else {
+        if (Mix_PlayMusic(music, 1) == -1) {
+            std::cerr << "音乐播放失败: " << Mix_GetError() << std::endl;
+        }
+        double duration = Mix_MusicDuration(music);
+        if (duration < 0) {
+            std::cerr << "无法获取音乐时长" << std::endl;
+        }
+        else {
+            std::cout << "音乐时长: " << duration << "秒" << std::endl;
+        }
+    }
+
+    // 进入事件循环，持续渲染内容，并响应窗口大小变化
+    bool quit = false;
+    SDL_Event event;
+    while (!quit) {
+        // 处理事件
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                quit = true;
+            }
+            // 这里不用额外更新逻辑尺寸，因SDL_RenderSetLogicalSize会自动处理缩放
+        }
+
+        // 每一帧重新绘制内容
+        SDL_RenderClear(renderer);
+
+        // 绘制图片（若加载成功，则覆盖整个逻辑区域）
+        if (imageTexture) {
+            SDL_RenderCopy(renderer, imageTexture, nullptr, nullptr);
+        }
+
+        // 绘制文字（绘制在左上角，大小根据纹理本身）
+        if (textTexture) {
+            SDL_Rect textRect = { 10, 10, 0, 0 };
+            SDL_QueryTexture(textTexture, nullptr, nullptr, &textRect.w, &textRect.h);
+            SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
+        }
+
+        SDL_RenderPresent(renderer);
+        SDL_Delay(16); // 控制大约60FPS
+    }
+
+    // 清理资源
+    if (imageTexture) {
+        SDL_DestroyTexture(imageTexture);
+    }
+    if (textTexture) {
+        SDL_DestroyTexture(textTexture);
+    }
+    if (music) {
+        Mix_FreeMusic(music);
+    }
+    Mix_CloseAudio();
+    IMG_Quit();
+    Mix_Quit();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return 0;
+}
