@@ -4,7 +4,7 @@
 AssetStore::AssetStore()
 {
     // 创建资源管理器时记录日志
-    std::string message = reinterpret_cast<const char*>(u8"创建资源管理器");
+    std::string message = U8_TO_CHARPTR("创建资源管理器");
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -15,7 +15,7 @@ AssetStore::~AssetStore()
     ClearAllAssets();
 
     // 销毁资源管理器时记录日志
-    std::string message = reinterpret_cast<const char*>(u8"资源管理器已销毁");
+    std::string message = U8_TO_CHARPTR("资源管理器已销毁");
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -28,12 +28,12 @@ void AssetStore::ClearImageAsset(const std::string& assetId)
         SDL_DestroyTexture(it->second);
         imageAssets.erase(it);  // 从容器中移除该资源
 
-		std::string message = reinterpret_cast<const char*>(u8"图片资源 ") + assetId + reinterpret_cast<const char*>(u8" 已清理");
+		std::string message = U8_TO_CHARPTR("图片资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
         Logger::Instance().Log(LogLevel::INFO, message);
 	}
     else
     {
-        std::string message = reinterpret_cast<const char*>(u8"图片资源 ") + assetId + reinterpret_cast<const char*>(u8" 不存在");
+        std::string message = U8_TO_CHARPTR("图片资源 ") + assetId + U8_TO_CHARPTR(" 不存在");
         Logger::Instance().Log(LogLevel::WARN, message);
     }
 }
@@ -46,7 +46,7 @@ void AssetStore::ClearImageAssets()
     }
     imageAssets.clear(); // 清空容器
 
-	std::string message = reinterpret_cast<const char*>(u8"已清理所有图片资源");
+	std::string message = U8_TO_CHARPTR("已清理所有图片资源");
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -59,12 +59,12 @@ void AssetStore::ClearAudioAsset(const std::string& assetId)
         Mix_FreeMusic(it->second);
         audioAssets.erase(it);  // 从容器中移除该资源
 
-		std::string message = reinterpret_cast<const char*>(u8"音频资源 ") + assetId + reinterpret_cast<const char*>(u8" 已清理");
+		std::string message = U8_TO_CHARPTR("音频资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
         Logger::Instance().Log(LogLevel::INFO, message);
     }
     else
     {
-		std::string message = reinterpret_cast<const char*>(u8"音频资源 ") + assetId + reinterpret_cast<const char*>(u8" 不存在");
+		std::string message = U8_TO_CHARPTR("音频资源 ") + assetId + U8_TO_CHARPTR(" 不存在");
 		Logger::Instance().Log(LogLevel::WARN, message);
     }
 }
@@ -77,7 +77,7 @@ void AssetStore::ClearAudioAssets()
     }
     audioAssets.clear(); // 清空容器
 
-	std::string message = reinterpret_cast<const char*>(u8"已清理所有音频资源");
+	std::string message = U8_TO_CHARPTR("已清理所有音频资源");
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -90,12 +90,12 @@ void AssetStore::ClearSoundEffectAsset(const std::string& assetId)
         Mix_FreeChunk(it->second);
         soundEffectAssets.erase(it);  // 从容器中移除该资源
         
-		std::string message = reinterpret_cast<const char*>(u8"音效资源 ") + assetId + reinterpret_cast<const char*>(u8" 已清理");
+		std::string message = U8_TO_CHARPTR("音效资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
 		Logger::Instance().Log(LogLevel::INFO, message);
 	}
 	else
 	{
-		std::string message = reinterpret_cast<const char*>(u8"音效资源 ") + assetId + reinterpret_cast<const char*>(u8" 不存在");
+		std::string message = U8_TO_CHARPTR("音效资源 ") + assetId + U8_TO_CHARPTR(" 不存在");
 		Logger::Instance().Log(LogLevel::WARN, message);
     }
 }
@@ -108,7 +108,7 @@ void AssetStore::ClearSoundEffectAssets()
     }
     soundEffectAssets.clear(); // 清空容器
 
-	std::string message = reinterpret_cast<const char*>(u8"已清理所有音效资源");
+	std::string message = U8_TO_CHARPTR("已清理所有音效资源");
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -121,12 +121,12 @@ void AssetStore::ClearFontAsset(const std::string& assetId)
         TTF_CloseFont(it->second);
         fontAssets.erase(it);  // 从容器中移除该资源
 
-		std::string message = reinterpret_cast<const char*>(u8"字体资源 ") + assetId + reinterpret_cast<const char*>(u8" 已清理");
+		std::string message = U8_TO_CHARPTR("字体资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
 		Logger::Instance().Log(LogLevel::INFO, message);
     }
     else
     {
-		std::string message = reinterpret_cast<const char*>(u8"字体资源 ") + assetId + reinterpret_cast<const char*>(u8" 不存在");
+		std::string message = U8_TO_CHARPTR("字体资源 ") + assetId + U8_TO_CHARPTR(" 不存在");
 		Logger::Instance().Log(LogLevel::WARN, message);
     }
 }
@@ -139,7 +139,7 @@ void AssetStore::ClearFontAssets()
     }
     fontAssets.clear(); // 清空容器
 
-	std::string message = reinterpret_cast<const char*>(u8"已清理所有字体资源");
+	std::string message = U8_TO_CHARPTR("已清理所有字体资源");
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -151,12 +151,12 @@ void AssetStore::ClearMapStyleAsset(const std::string& assetId)
 		// 释放地图样式资源
 		delete it->second;
 		mapStyleAssets.erase(it);  // 从容器中移除该资源
-		std::string message = reinterpret_cast<const char*>(u8"地图样式资源 ") + assetId + reinterpret_cast<const char*>(u8" 已清理");
+		std::string message = U8_TO_CHARPTR("地图样式资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
 		Logger::Instance().Log(LogLevel::INFO, message);
 	}
 	else
 	{
-		std::string message = reinterpret_cast<const char*>(u8"地图样式资源 ") + assetId + reinterpret_cast<const char*>(u8" 不存在");
+		std::string message = U8_TO_CHARPTR("地图样式资源 ") + assetId + U8_TO_CHARPTR(" 不存在");
 		Logger::Instance().Log(LogLevel::WARN, message);
 	}
 }
@@ -168,7 +168,7 @@ void AssetStore::ClearMapStyleAssets()
 		delete asset;  // 释放每个地图样式资源
 	}
 	mapStyleAssets.clear(); // 清空容器
-	std::string message = reinterpret_cast<const char*>(u8"已清理所有地图样式资源");
+	std::string message = U8_TO_CHARPTR("已清理所有地图样式资源");
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -181,7 +181,7 @@ void AssetStore::ClearAllAssets()
     ClearFontAssets();        // 清理所有字体资源
 	ClearMapStyleAssets();    // 清理所有地图样式资源
 
-	std::string message = reinterpret_cast<const char*>(u8"已清理所有资源");
+	std::string message = U8_TO_CHARPTR("已清理所有资源");
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -190,7 +190,7 @@ void AssetStore::AddImageAsset(SDL_Renderer* renderer, const std::string& assetI
 {
     // 检查资源是否已存在
     if (imageAssets.find(assetId) != imageAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"图片资源ID已存在：") + assetId;
+		std::string message = U8_TO_CHARPTR("图片资源ID已存在：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;
     }
@@ -198,7 +198,7 @@ void AssetStore::AddImageAsset(SDL_Renderer* renderer, const std::string& assetI
     // 加载图片文件为 surface
     SDL_Surface* surface = IMG_Load(path.c_str());
     if (!surface) {
-		std::string message = reinterpret_cast<const char*>(u8"加载图片失败：") + path + " " + IMG_GetError();
+		std::string message = U8_TO_CHARPTR("加载图片失败：") + path + " " + IMG_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -207,7 +207,7 @@ void AssetStore::AddImageAsset(SDL_Renderer* renderer, const std::string& assetI
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);  // 不再需要 surface，立即释放
     if (!texture) {
-		std::string message = reinterpret_cast<const char*>(u8"创建纹理失败：") + path + " " + SDL_GetError();
+		std::string message = U8_TO_CHARPTR("创建纹理失败：") + path + " " + SDL_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -215,7 +215,7 @@ void AssetStore::AddImageAsset(SDL_Renderer* renderer, const std::string& assetI
     // 将纹理添加到资源容器中
 	imageAssets.emplace(assetId, texture);
 
-	std::string message = reinterpret_cast<const char*>(u8"加载图片资源：资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("加载图片资源：资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -224,7 +224,7 @@ void AssetStore::AddAudioAsset(const std::string& assetId, const std::string& pa
 {
     // 检查资源是否已存在
     if (audioAssets.find(assetId) != audioAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"音频资源ID已存在：") + assetId;
+		std::string message = U8_TO_CHARPTR("音频资源ID已存在：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;
     }
@@ -232,7 +232,7 @@ void AssetStore::AddAudioAsset(const std::string& assetId, const std::string& pa
     // 加载音频资源
     Mix_Music* music = Mix_LoadMUS(path.c_str());
     if (!music) {
-		std::string message = reinterpret_cast<const char*>(u8"加载音频失败：") + path + " " + Mix_GetError();
+		std::string message = U8_TO_CHARPTR("加载音频失败：") + path + " " + Mix_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -240,7 +240,7 @@ void AssetStore::AddAudioAsset(const std::string& assetId, const std::string& pa
     // 将音频资源添加到容器中
 	audioAssets.emplace(assetId, music);
 
-	std::string message = reinterpret_cast<const char*>(u8"加载音频资源：资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("加载音频资源：资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -249,7 +249,7 @@ void AssetStore::AddSoundEffectAsset(const std::string& assetId, const std::stri
 {
     // 检查资源是否已存在
     if (soundEffectAssets.find(assetId) != soundEffectAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"音效资源ID已存在：") + assetId;
+		std::string message = U8_TO_CHARPTR("音效资源ID已存在：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;
     }
@@ -257,7 +257,7 @@ void AssetStore::AddSoundEffectAsset(const std::string& assetId, const std::stri
     // 加载音效资源
     Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
     if (!chunk) {
-		std::string message = reinterpret_cast<const char*>(u8"加载音效失败：") + path + " " + Mix_GetError();
+		std::string message = U8_TO_CHARPTR("加载音效失败：") + path + " " + Mix_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -265,7 +265,7 @@ void AssetStore::AddSoundEffectAsset(const std::string& assetId, const std::stri
     // 将音效资源添加到容器中
 	soundEffectAssets.emplace(assetId, chunk);
 
-	std::string message = reinterpret_cast<const char*>(u8"加载音效资源：资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("加载音效资源：资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -274,7 +274,7 @@ void AssetStore::AddFontAsset(const std::string& assetId, const std::string& pat
 {
     // 检查资源是否已存在
     if (fontAssets.find(assetId) != fontAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"字体资源ID已存在：") + assetId;
+		std::string message = U8_TO_CHARPTR("字体资源ID已存在：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;
     }
@@ -282,7 +282,7 @@ void AssetStore::AddFontAsset(const std::string& assetId, const std::string& pat
     // 加载字体资源
     TTF_Font* font = TTF_OpenFont(path.c_str(), psize);
     if (!font) {
-		std::string message = reinterpret_cast<const char*>(u8"加载字体失败：") + path + " " + TTF_GetError();
+		std::string message = U8_TO_CHARPTR("加载字体失败：") + path + " " + TTF_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -290,7 +290,7 @@ void AssetStore::AddFontAsset(const std::string& assetId, const std::string& pat
     // 将字体资源添加到容器中
 	fontAssets.emplace(assetId, font);
 
-	std::string message = reinterpret_cast<const char*>(u8"加载字体资源：资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("加载字体资源：资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -299,7 +299,7 @@ void AssetStore::AddMapStyleAsset(const std::string& assetId, const std::string&
 {
 	// 检查资源是否已存在
 	if (mapStyleAssets.find(assetId) != mapStyleAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"地图样式资源ID已存在：") + assetId;
+		std::string message = U8_TO_CHARPTR("地图样式资源ID已存在：") + assetId;
 		Logger::Instance().Log(LogLevel::WARN, message);
 		return;
 	}
@@ -309,7 +309,7 @@ void AssetStore::AddMapStyleAsset(const std::string& assetId, const std::string&
 	// 将地图样式资源添加到容器中
 	mapStyleAssets.emplace(assetId, mapStyle);
 
-	std::string message = reinterpret_cast<const char*>(u8"加载地图样式资源：资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("加载地图样式资源：资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -318,7 +318,7 @@ void AssetStore::ChangeImageAsset(SDL_Renderer* renderer, const std::string& ass
 {
     // 检查资源ID是否存在，不存在则退出
     if (imageAssets.find(assetId) == imageAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"图片资源ID不存在，退出操作：") + assetId;
+		std::string message = U8_TO_CHARPTR("图片资源ID不存在，退出操作：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;  // 资源不存在时，直接退出
     }
@@ -329,7 +329,7 @@ void AssetStore::ChangeImageAsset(SDL_Renderer* renderer, const std::string& ass
     // 加载新的图片资源
     SDL_Surface* surface = IMG_Load(path.c_str());
     if (!surface) {
-		std::string message = reinterpret_cast<const char*>(u8"加载图片失败：") + path + " " + SDL_GetError();
+		std::string message = U8_TO_CHARPTR("加载图片失败：") + path + " " + SDL_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -338,7 +338,7 @@ void AssetStore::ChangeImageAsset(SDL_Renderer* renderer, const std::string& ass
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);  // 释放 surface 内存
     if (!texture) {
-		std::string message = reinterpret_cast<const char*>(u8"创建纹理失败：") + path + " " + SDL_GetError();
+		std::string message = U8_TO_CHARPTR("创建纹理失败：") + path + " " + SDL_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -346,7 +346,7 @@ void AssetStore::ChangeImageAsset(SDL_Renderer* renderer, const std::string& ass
     // 存储新的纹理到资源容器
     imageAssets[assetId] = texture;
 
-	std::string message = reinterpret_cast<const char*>(u8"替换图片资源 资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("替换图片资源 资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -355,7 +355,7 @@ void AssetStore::ChangeAudioAsset(const std::string& assetId, const std::string&
 {
     // 检查资源ID是否存在，不存在则退出
     if (audioAssets.find(assetId) == audioAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"音频资源ID不存在，退出操作：") + assetId;
+		std::string message = U8_TO_CHARPTR("音频资源ID不存在，退出操作：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;  // 资源不存在时，直接退出
     }
@@ -366,7 +366,7 @@ void AssetStore::ChangeAudioAsset(const std::string& assetId, const std::string&
     // 加载新的音频资源
     Mix_Music* music = Mix_LoadMUS(path.c_str());
     if (!music) {
-		std::string message = reinterpret_cast<const char*>(u8"加载音频失败：") + path + " " + Mix_GetError();
+		std::string message = U8_TO_CHARPTR("加载音频失败：") + path + " " + Mix_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -374,7 +374,7 @@ void AssetStore::ChangeAudioAsset(const std::string& assetId, const std::string&
     // 存储新的音频资源
     audioAssets[assetId] = music;
 
-	std::string message = reinterpret_cast<const char*>(u8"替换音频资源 资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("替换音频资源 资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -383,7 +383,7 @@ void AssetStore::ChangeSoundEffectAsset(const std::string& assetId, const std::s
 {
     // 检查资源ID是否存在，不存在则退出
     if (soundEffectAssets.find(assetId) == soundEffectAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"音效资源ID不存在，退出操作：") + assetId;
+		std::string message = U8_TO_CHARPTR("音效资源ID不存在，退出操作：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;  // 资源不存在时，直接退出
     }
@@ -394,7 +394,7 @@ void AssetStore::ChangeSoundEffectAsset(const std::string& assetId, const std::s
     // 加载新的音效资源
     Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
     if (!chunk) {
-		std::string message = reinterpret_cast<const char*>(u8"加载音效失败：") + path + " " + Mix_GetError();
+		std::string message = U8_TO_CHARPTR("加载音效失败：") + path + " " + Mix_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -402,7 +402,7 @@ void AssetStore::ChangeSoundEffectAsset(const std::string& assetId, const std::s
     // 存储新的音效资源
     soundEffectAssets[assetId] = chunk;
 
-	std::string message = reinterpret_cast<const char*>(u8"替换音效资源 资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("替换音效资源 资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -411,7 +411,7 @@ void AssetStore::ChangeFontAsset(const std::string& assetId, const std::string& 
 {
     // 检查资源ID是否存在，不存在则退出
     if (fontAssets.find(assetId) == fontAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"字体资源ID不存在，退出操作：") + assetId;
+		std::string message = U8_TO_CHARPTR("字体资源ID不存在，退出操作：") + assetId;
         Logger::Instance().Log(LogLevel::WARN, message);
         return;  // 资源不存在时，直接退出
     }
@@ -422,7 +422,7 @@ void AssetStore::ChangeFontAsset(const std::string& assetId, const std::string& 
     // 加载新的字体资源
     TTF_Font* font = TTF_OpenFont(path.c_str(), psize);
     if (!font) {
-		std::string message = reinterpret_cast<const char*>(u8"加载字体失败：") + path + " " + TTF_GetError();
+		std::string message = U8_TO_CHARPTR("加载字体失败：") + path + " " + TTF_GetError();
         Logger::Instance().Log(LogLevel::ERROR, message);
         return;
     }
@@ -430,7 +430,7 @@ void AssetStore::ChangeFontAsset(const std::string& assetId, const std::string& 
     // 存储新的字体资源
     fontAssets[assetId] = font;
 
-	std::string message = reinterpret_cast<const char*>(u8"替换字体资源 资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("替换字体资源 资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -439,7 +439,7 @@ void AssetStore::ChangeMapStyleAsset(const std::string& assetId, const std::stri
 {
 	// 检查资源ID是否存在，不存在则退出
 	if (mapStyleAssets.find(assetId) == mapStyleAssets.end()) {
-		std::string message = reinterpret_cast<const char*>(u8"地图样式资源ID不存在，退出操作：") + assetId;
+		std::string message = U8_TO_CHARPTR("地图样式资源ID不存在，退出操作：") + assetId;
 		Logger::Instance().Log(LogLevel::WARN, message);
 		return;  // 资源不存在时，直接退出
 	}
@@ -452,7 +452,7 @@ void AssetStore::ChangeMapStyleAsset(const std::string& assetId, const std::stri
 
 	// 存储新的地图样式资源
 	mapStyleAssets[assetId] = mapStyle;
-	std::string message = reinterpret_cast<const char*>(u8"替换地图样式资源 资产编号：") + assetId + reinterpret_cast<const char*>(u8" 资产路径：") + path;
+	std::string message = U8_TO_CHARPTR("替换地图样式资源 资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 

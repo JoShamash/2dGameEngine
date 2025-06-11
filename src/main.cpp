@@ -1,6 +1,6 @@
 #if defined(_WIN32) || defined(_WIN64)
 #define INIT_LANG system("chcp 65001")
-#elif
+#else
 #define INIT_LANG
 #endif
 

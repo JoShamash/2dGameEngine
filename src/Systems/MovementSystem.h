@@ -10,7 +10,7 @@
 
 class MovementSystem : public System 
 {
-	inline static const std::string NAME = std::string("MovementSystem") + reinterpret_cast<const char*>(u8"运动系统"); // 系统名称
+	inline static const std::string NAME = std::string("MovementSystem") + U8_TO_CHARPTR("运动系统"); // 系统名称
 
 public:
 	MovementSystem() 
@@ -30,8 +30,8 @@ public:
 			transformComponent.position.y += rigidBodyComponent.volocity.y * deltaTime;
 
 			std::ostringstream oss;
-			oss << reinterpret_cast<const char*>(u8"更新，实体(id=") << entity.GetId()
-				<< reinterpret_cast<const char*>(u8")位置为")
+			oss << U8_TO_CHARPTR("更新，实体(id=") << entity.GetId()
+				<< U8_TO_CHARPTR(")位置为")
 				<< std::fixed << std::setprecision(2)  // 设置保留两位小数
 				<< transformComponent.position.x << ", "
 				<< transformComponent.position.y;

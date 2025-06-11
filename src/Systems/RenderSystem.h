@@ -10,7 +10,7 @@
 
 class RenderSystem : public System
 {
-	inline static const std::string NAME = std::string("RenderSystem") + reinterpret_cast<const char*>(u8"渲染系统"); // 系统名称
+	inline static const std::string NAME = std::string("RenderSystem") + U8_TO_CHARPTR("渲染系统"); // 系统名称
 
 public:
 	RenderSystem()
@@ -45,7 +45,7 @@ public:
 				SDL_FLIP_NONE
 			);
 
-			std::string message = reinterpret_cast<const char*>(u8"渲染，实体(id=") + std::to_string(entity.GetId()) + ")";
+			std::string message = U8_TO_CHARPTR("渲染，实体(id=") + std::to_string(entity.GetId()) + ")";
 			Logger::Instance().Log(LogLevel::INFO, RenderSystem::NAME + message);
 		}
 	}

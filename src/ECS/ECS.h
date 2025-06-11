@@ -14,11 +14,17 @@
 
 const glm::uint64 MAX_COMPONENTS = 1024; // 组件数量上限
 
-using Signature = std::bitset<MAX_COMPONENTS>; // 组件签名，每个组件对应一个bit位
+using Signature = std::bitset<MAX_COMPONENTS>; // 组件位图签名，每个组件对应一个bit位
 
 class Registry; // 前向声明注册表类
 
-// 实体类，表示引擎中的对象
+//   _____           _     _   _           
+//  | ____|  _ __   | |_  (_) | |_   _   _ 
+//  |  _|   | '_ \  | __| | | | __| | | | |
+//  | |___  | | | | | |_  | | | |_  | |_| |
+//  |_____| |_| |_|  \__| |_|  \__|  \__, |
+//                                   |___/ 
+// 实体类，表示引擎中的对象，如玩家、敌人等，用来标识和管理实体的唯一标识符
 class Entity 
 {
 public:
@@ -33,13 +39,16 @@ public:
 	bool operator<(const Entity& other) const;
 
 	// 获取实体的唯一标识符
-	glm::uint64 GetId() const;
+	inline glm::uint64 GetId() const
+	{
+		return id;
+	}
 
 	// 添加组件
 	template <typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
 
 	// 移除组件
-	template <typename TComponent> void RemoveComponent();
+	template <typename TComponent> void RemoveComponent() const;
 
 	// 检查是否有组件
 	template <typename TComponent> bool HasComponent() const;
@@ -47,34 +56,46 @@ public:
 	// 获取组件
 	template <typename TComponent> TComponent& GetComponent() const;
 
-	Registry* registry = nullptr; // 实体注册表指针，用于访问注册表
+	Registry* registry = nullptr; // 注册表指针，用于访问注册表
 
 private:
 	glm::uint64 id;
 };
 
-// 组件基类，所有组件都继承自该类
+//    ____                                                              _   
+//   / ___|   ___    _ __ ___    _ __     ___    _ __     ___   _ __   | |_ 
+//  | |      / _ \  | '_ ` _ \  | '_ \   / _ \  | '_ \   / _ \ | '_ \  | __|
+//  | |___  | (_) | | | | | | | | |_) | | (_) | | | | | |  __/ | | | | | |_ 
+//   \____|  \___/  |_| |_| |_| | .__/   \___/  |_| |_|  \___| |_| |_|  \__|
+//                              |_|                                         
+// 组件基类，所有组件都继承自该类，通过IComponent*实现多态访问组件
 struct IComponent
 {
 protected:
 	inline static glm::uint64 nextId = 0; // 下一个组件唯一标识符
 };
 
-// 组件模板类，表示引擎中的组件
+// 组件模板类，表示引擎中的组件，如位置组件、精灵组件等，用来标识和管理组件的唯一标识符
 template <typename T>
 class Component: public IComponent
 {
-	inline static glm::uint64 id = nextId++; // 组件唯一标识符
+	inline static glm::uint64 id = nextId++; // 组件唯一标识符，属于Component类
 
 public:
 	// 获取组件的唯一标识符
-	static glm::uint64 GetId()
+	inline static glm::uint64 GetId()
 	{
 		return id;
 	}
 };
 
-// 系统类，表示引擎中的系统
+//   ____                  _                      
+//  / ___|   _   _   ___  | |_    ___   _ __ ___  
+//  \___ \  | | | | / __| | __|  / _ \ | '_ ` _ \ 
+//   ___) | | |_| | \__ \ | |_  |  __/ | | | | | |
+//  |____/   \__, | |___/  \__|  \___| |_| |_| |_|
+//           |___/                                
+// 系统类，表示引擎中的系统，如渲染系统、物理系统等，用来管理和处理实体的组件逻辑
 class System 
 {
 public:
@@ -93,14 +114,26 @@ public:
 	// 获取系统的组件签名
 	const Signature& GetComponentSignature() const;
 
-	// 提供组件给系统
+	// 提供需要的组件给系统
 	template <typename TComponent> void RequireComponent();
+
+	// 移除系统对特定组件的需求
+	template <typename TComponent> void DisRequireComponent();
+
+	// 检查系统是否需要特定组件
+	template <typename TComponent> bool HasComponent() const;
 
 private:
 	Signature componentSignature; // 系统组件签名
 	std::vector<Entity> entities; // 系统管理的实体列表
 };
 
+//   ____                    _ 
+//  |  _ \    ___     ___   | |
+//  | |_) |  / _ \   / _ \  | |
+//  |  __/  | (_) | | (_) | | |
+//  |_|      \___/   \___/  |_|
+//                             
 // 组件池接口类
 class IPool
 {
@@ -114,87 +147,62 @@ template <typename TComponent>
 class Pool: public IPool
 {
 public:
-	Pool(glm::uint64 capacity = 128)
-	{
-		data.resize(capacity);
-	}
+	Pool(glm::uint64 capacity = 16);
 	virtual ~Pool() = default;
 
 	// 组件池是否为空
-	bool IsEmpty()
-	{
-		return data.empty();
-	}
+	inline bool IsEmpty();
 
 	// 获取组件池的组件数量
-	glm::uint64 GetSize()
-	{
-		return data.size();
-	}
+	inline glm::uint64 GetSize();
 
 	// 重新调整组件池大小
-	void Resize(glm::uint64 size)
-	{
-		data.resize(size);
-	}
+	inline void Resize(glm::uint64 size);
 	
 	// 清空组件池
-	void Clear()
-	{
-		data.clear();
-	}
+	inline void Clear();
 
 	// 添加组件到组件池
-	void Add(TComponent component)
-	{
-		data.push_back(component);
-	}
+	inline void Add(TComponent component);
 
-	// 通过entity实体ID下标设置组件到组件池，组件池的下标与实体ID一致
-	void Set(glm::uint64 entityId, TComponent component)
-	{
-		// 如果实体ID大于组件池的大小，则扩容组件池
-		if (entityId >= GetSize())
-		{
-			data.resize(entityId * 2);
-		}
+	// 通过实体ID设置组件到组件池，组件池的下标与实体ID一致
+	inline void Set(glm::uint64 entityId, TComponent component);
 
-		// 组件池中对应实体ID下标的组件设置为传入的组件
-		data[entityId] = component;
-	}
-
-	// 获取组件池中对应下标的组件
-	TComponent& Get(glm::uint64 index)
-	{
-		return static_cast<TComponent&>(data[index]);
-	}
+	// 获取组件池中对应下标的组件，即实体ID对应的组件
+	inline TComponent& Get(glm::uint64 index);
 
 
 	// 获取组件池中对应下标的组件
-	TComponent& operator[](glm::uint64 index)
-	{
-		return data[index];
-	}
+	inline TComponent& operator[](glm::uint64 index);
 
 private:
-	std::vector<TComponent> data; // 组件池数据，下标为实体ID，存储对应的组件
+	std::vector<TComponent> data; // 组件池数据，下标为实体ID，存储不同实体ID对应的TComponent组件
 };
 
+//   ____                   _         _                  
+//  |  _ \    ___    __ _  (_)  ___  | |_   _ __   _   _ 
+//  | |_) |  / _ \  / _` | | | / __| | __| | '__| | | | |
+//  |  _ <  |  __/ | (_| | | | \__ \ | |_  | |    | |_| |
+//  |_| \_\  \___|  \__, | |_| |___/  \__| |_|     \__, |
+//                  |___/                          |___/ 
 // 注册表类，管理ECS的实体、组件和系统
 class Registry 
 {
 public:
-	Registry(glm::uint64 capacity = 128);
+	Registry(glm::uint64 capacity = 16);
 	~Registry() = default;
 
 	// 创建实体
-	Entity& CreateEntity();
+	Entity CreateEntity();
 
 	// 销毁实体
 	void DestroyEntity(const Entity& entity);
 
 	// 添加实体到系统
 	void AddEntityToSystem(const Entity& entity);
+
+	// 移除实体从系统
+	void RemoveEntityFromSystem(const Entity& entity);
 
 	// 添加相应组件
 	template <typename TComponent, typename ...TArgs> void AddComponent(const Entity& entity, TArgs&& ...args);
@@ -221,18 +229,150 @@ public:
 	template <typename TSystem> TSystem& GetSystem() const;
 
 	// 更新注册表，处理添加和删除的实体
-	void Update();
+	inline void Update();
 
 private:  
 	glm::uint64 numEntities = 0;		// 当前实体数量，同时也代表下一个实体ID
 	std::set<Entity> entitiesToBeAdd;   // 待添加的实体集合
 	std::set<Entity> entitiesToBeKill;  // 待销毁的实体集合
 
-	std::vector<std::shared_ptr<IPool>> componentPools;					   // 组件池集合，存储所有组件池，下标为组件ID
-	std::vector<Signature> entityComponentSignatures;					   // 实体组件签名集合，存储每个实体的组件签名，下标为实体ID
+	std::vector<std::shared_ptr<IPool>> componentPools;					   // 组件池集合，存储对应组件的组件池，下标为组件ID，eg. componentPools[componentId]
+	std::vector<Signature> componentSignatures;							   // 组件签名集合，存储对应实体的组件签名，下标为实体ID，eg. componentSignatures[entityId]
 	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;  // 系统集合，存储所有系统，key为系统类型
 };
 
+//   _____                              _           _          
+//  |_   _|   ___   _ __ ___    _ __   | |   __ _  | |_    ___ 
+//    | |    / _ \ | '_ ` _ \  | '_ \  | |  / _` | | __|  / _ \
+//    | |   |  __/ | | | | | | | |_) | | | | (_| | | |_  |  __/
+//    |_|    \___| |_| |_| |_| | .__/  |_|  \__,_|  \__|  \___|
+//                             |_|                             
+//   ___                       _                                     _             _     _                 
+//  |_ _|  _ __ ___    _ __   | |   ___   _ __ ___     ___   _ __   | |_    __ _  | |_  (_)   ___    _ __  
+//   | |  | '_ ` _ \  | '_ \  | |  / _ \ | '_ ` _ \   / _ \ | '_ \  | __|  / _` | | __| | |  / _ \  | '_ \ 
+//   | |  | | | | | | | |_) | | | |  __/ | | | | | | |  __/ | | | | | |_  | (_| | | |_  | | | (_) | | | | |
+//  |___| |_| |_| |_| | .__/  |_|  \___| |_| |_| |_|  \___| |_| |_|  \__|  \__,_|  \__| |_|  \___/  |_| |_|
+//                    |_|                                                                                  
+/// <summary>
+/// 组件池模板类，表示引擎中的相应组件类型的组件池
+/// </summary>
+/// <typeparam name="TComponent">组件类型</typeparam>
+/// <param name="capacity">组件池初始容量</param>
+template <typename TComponent>
+Pool<TComponent>::Pool(glm::uint64 capacity)
+{
+	if (capacity < 16)
+	{
+		capacity = 16;
+	}
+	data.resize(capacity); // 初始化组件池数据，设置初始容量
+}
+
+/// <summary>
+///	组件池是否为空
+/// </summary>
+/// <typeparam name="TComponent"></typeparam>
+/// <returns>布尔值，表示组件池是否为空</returns>
+template <typename TComponent>
+bool Pool<TComponent>::IsEmpty()
+{
+	return data.empty(); 
+}
+
+/// <summary>
+/// 获取组件池的组件数量
+/// </summary>
+/// <typeparam name="TComponent">组件类型</typeparam>
+/// <returns>组件数量</returns>
+template <typename TComponent>
+glm::uint64 Pool<TComponent>::GetSize()
+{
+	return data.size();
+}
+
+/// <summary>
+/// 重新调整组件池大小
+/// </summary>
+/// <typeparam name="TComponent">组件类型</typeparam>
+/// <param name="size">新的大小</param>
+template <typename TComponent>
+void Pool<TComponent>::Resize(glm::uint64 size)
+{
+	data.resize(size);
+}
+
+/// <summary>
+/// 清空组件池
+/// </summary>
+/// <typeparam name="TComponent"></typeparam>
+template <typename TComponent>
+void Pool<TComponent>::Clear()
+{
+	data.clear();
+}
+
+/// <summary>
+/// 添加特定组件到组件池
+/// </summary>
+/// <typeparam name="TComponent"></typeparam>
+/// <param name="component"></param>
+template <typename TComponent>
+void Pool<TComponent>::Add(TComponent component)
+{
+	data.push_back(component);
+}
+
+/// <summary>
+/// 通过实体ID设置组件到组件池，组件池的下标与实体ID一致
+/// </summary>
+/// <typeparam name="TComponent">组件类型</typeparam>
+/// <param name="entityId">实体ID</param>
+/// <param name="component">组件</param>
+template <typename TComponent>
+void Pool<TComponent>::Set(glm::uint64 entityId, TComponent component)
+{
+	// 如果实体ID大于组件池的大小，则扩容组件池
+	if (entityId >= GetSize())
+	{
+		data.resize(entityId * 2);
+	}
+
+	// 组件池中对应实体ID下标的组件设置为传入的组件
+	data[entityId] = component;
+}
+
+/// <summary>
+/// 获取组件池中对应下标的组件，即实体ID对应的组件
+/// </summary>
+/// <typeparam name="TComponent"></typeparam>
+/// <param name="index"></param>
+/// <returns>组件的引用</returns>
+template <typename TComponent>
+TComponent& Pool<TComponent>::Get(glm::uint64 index)
+{
+	// 检查下标是否越界
+	if (index >= data.size())
+	{
+		std::string message = U8_TO_CHARPTR("错误：组件池下标越界，尝试访问的下标为") + std::to_string(index);
+		Logger::Instance().Log(LogLevel::ERROR, message);
+		throw std::out_of_range("Index out of bounds");
+	}
+	return data[index];
+}
+
+/// <summary>
+/// 获取组件池中对应下标(实体ID)的组件
+/// </summary>
+/// <typeparam name="TComponent"></typeparam>
+/// <param name="index"></param>
+/// <returns>组件的引用</returns>
+template <typename TComponent>
+TComponent& Pool<TComponent>::operator[](glm::uint64 index)
+{
+	return data[index];
+}
+
+/*-------------------------------------------------------------------------------------------------*/
 
 /// <summary>
 /// 添加特定组件到实体
@@ -241,7 +381,7 @@ private:
 /// <typeparam name="TArgs">组件构造函数参数类型</typeparam>
 /// <param name="args">组件构造函数参数</param>
 template<typename TComponent, typename ...TArgs>
-inline void Entity::AddComponent(TArgs && ...args)
+inline void Entity::AddComponent(TArgs&& ...args)
 {
 	registry->AddComponent<TComponent>(*this, std::forward<TArgs>(args)...);
 }
@@ -251,7 +391,7 @@ inline void Entity::AddComponent(TArgs && ...args)
 /// </summary>
 /// <typeparam name="TComponent">组件类型</typeparam>
 template<typename TComponent>
-inline void Entity::RemoveComponent()
+inline void Entity::RemoveComponent() const
 {
 	registry->RemoveComponent<TComponent>(*this);
 }
@@ -260,6 +400,7 @@ inline void Entity::RemoveComponent()
 /// 检查实体是否有特定组件
 /// </summary>
 /// <typeparam name="TComponent">组件类型</typeparam>
+/// <returns>布尔值，表示实体是否有特定组件</returns>
 template<typename TComponent>
 inline bool Entity::HasComponent() const
 {
@@ -277,8 +418,10 @@ inline TComponent& Entity::GetComponent() const
 	return registry->GetComponent<TComponent>(*this);
 }
 
+/*-------------------------------------------------------------------------------------------------*/
+
 /// <summary>
-/// 添加需要的特定组件到系统
+/// 添加需要的特定组件到系统，更改系统组件签名
 /// </summary>
 /// <typeparam name="TComponent">组件类型</typeparam>
 template <typename TComponent>
@@ -289,6 +432,31 @@ inline void System::RequireComponent()
 }
 
 /// <summary>
+/// 移除系统对特定组件的需求，更改系统组件签名
+/// </summary>
+/// <typeparam name="TComponent">组件类型</typeparam>
+template <typename TComponent>
+inline void System::DisRequireComponent()
+{
+	const auto componentId = Component<TComponent>::GetId();
+	componentSignature.reset(componentId);
+}
+
+/// <summary>
+/// 检查系统是否需要特定组件
+/// </summary>
+/// <typeparam name="TComponent">组件类型</typeparam>
+/// <returns>布尔值，表示系统是否需要特定组件</returns>
+template <typename TComponent>
+inline bool System::HasComponent() const
+{
+	const auto componentId = Component<TComponent>::GetId();
+	return componentSignature.test(componentId);
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+
+/// <summary>
 /// 给实体添加相应组件
 /// </summary>
 /// <typeparam name="TComponent">组件类型</typeparam>
@@ -296,7 +464,7 @@ inline void System::RequireComponent()
 /// <param name="entity">实体</param>
 /// <param name="args">组件构造函数参数</param>
 template<typename TComponent, typename ...TArgs>
-inline void Registry::AddComponent(const Entity& entity, TArgs && ...args)
+inline void Registry::AddComponent(const Entity& entity, TArgs&& ...args)
 {
 	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
@@ -316,9 +484,9 @@ inline void Registry::AddComponent(const Entity& entity, TArgs && ...args)
 	
 	TComponent newComponent(std::forward<TArgs>(args)...);
 	componentPool->Set(entityId, newComponent);
-	entityComponentSignatures[entityId].set(componentId);
+	componentSignatures[entityId].set(componentId);
 
-	std::string message = reinterpret_cast<const char*>(u8"添加") + TComponent::NAME + reinterpret_cast<const char*>(u8"到实体(id=") + std::to_string(entityId) + ")";
+	std::string message = U8_TO_CHARPTR("添加") + TComponent::NAME + U8_TO_CHARPTR("到实体(id=") + std::to_string(entityId) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 /// <summary>
@@ -331,9 +499,9 @@ inline void Registry::RemoveComponent(const Entity& entity)
 {
 	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
-	entityComponentSignatures[entityId].reset(componentId);
+	componentSignatures[entityId].reset(componentId);
 
-	std::string message = reinterpret_cast<const char*>(u8"移除") + TComponent::NAME + reinterpret_cast<const char*>(u8"从实体(id=") + std::to_string(entityId) + ")";
+	std::string message = U8_TO_CHARPTR("移除") + TComponent::NAME + U8_TO_CHARPTR("从实体(id=") + std::to_string(entityId) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -347,7 +515,7 @@ inline bool Registry::HasComponent(const Entity& entity) const
 {
 	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
-	return entityComponentSignatures[entityId].test(componentId);
+	return componentSignatures[entityId].test(componentId);
 }
 
 /// <summary>

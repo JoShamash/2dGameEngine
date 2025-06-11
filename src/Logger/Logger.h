@@ -1,3 +1,5 @@
+#define U8_TO_CHARPTR(x) reinterpret_cast<const char*>(u8##x)
+
 #ifndef LOGGER_H
 #define LOGGER_H
 
@@ -63,7 +65,6 @@ public:
 	* @brief 记录一条日志
     * @param level 日志级别
     * @param message 日志内容
-    * @param loc 调用处源码位置信息，默认使用 std::source_location::current()
     */
     void Log(LogLevel level, const std::string& message);
 

@@ -5,13 +5,15 @@
 
 #include <string>
 
+#include "../Logger/Logger.h"
+
 /**
 * @struct TransformComponent
 * @brief 转换组件，控制坐标、大小、角度
 */
 struct TransformComponent 
 {
-	inline const static std::string NAME = std::string("TransformComponent") + reinterpret_cast<const char*>(u8"转换组件"); // 组件名称
+	inline const static std::string NAME = std::string("TransformComponent") + U8_TO_CHARPTR("转换组件"); // 组件名称
 
 	glm::f64vec2 position; // 坐标位置（x, y）
 	double rotation;	   // 角度

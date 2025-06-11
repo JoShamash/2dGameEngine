@@ -13,7 +13,7 @@
 
 GameEngine::GameEngine()
 {
-	std::string message = reinterpret_cast<const char*>(u8"创建游戏引擎");
+	std::string message = U8_TO_CHARPTR("创建游戏引擎");
 	Logger::Instance().Log(LogLevel::INFO, message);
 
 	registry = std::make_unique<Registry>();
@@ -22,7 +22,7 @@ GameEngine::GameEngine()
 
 GameEngine::~GameEngine()
 {
-	std::string message = reinterpret_cast<const char*>(u8"销毁游戏引擎");
+	std::string message = U8_TO_CHARPTR("销毁游戏引擎");
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
@@ -30,7 +30,7 @@ void GameEngine::Initialize()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
-		std::string message = reinterpret_cast<const char*>(u8"SDL初始化失败：");
+		std::string message = U8_TO_CHARPTR("SDL初始化失败：");
 		message += SDL_GetError();
 		Logger::Instance().Log(LogLevel::ERROR, message);
 		return;
@@ -40,7 +40,7 @@ void GameEngine::Initialize()
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 	windowWidth = displayMode.w;
 	windowHeight = displayMode.h;
-	window = SDL_CreateWindow(reinterpret_cast<const char*>(u8"你好世界"),
+	window = SDL_CreateWindow(U8_TO_CHARPTR("你好世界"),
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
 		windowWidth,
@@ -48,7 +48,7 @@ void GameEngine::Initialize()
 		SDL_WINDOW_RESIZABLE);
 	if (!window)
 	{
-		std::string message = reinterpret_cast<const char*>(u8"创建SDL窗口失败：");
+		std::string message = U8_TO_CHARPTR("创建SDL窗口失败：");
 		message += SDL_GetError();
 		Logger::Instance().Log(LogLevel::ERROR, message);
 		return;
@@ -57,7 +57,7 @@ void GameEngine::Initialize()
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer)
 	{
-		std::string message = reinterpret_cast<const char*>(u8"创建SDL渲染器失败：");
+		std::string message = U8_TO_CHARPTR("创建SDL渲染器失败：");
 		message += SDL_GetError();
 		Logger::Instance().Log(LogLevel::ERROR, message);
 		return;
@@ -74,7 +74,7 @@ void GameEngine::Destroy()
 	SDL_Quit();
 }
 
-void GameEngine::ProcessInput()
+void GameEngine::Input()
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -155,13 +155,14 @@ void GameEngine::SetUp()
 
 void GameEngine::Update()
 {
-	Uint64 timeToWait = millisecsPerFrame - (SDL_GetTicks64() - millisecsPreFrame);
+	auto timeToWait = millisecsPerFrame - (SDL_GetTicks64() - millisecsPreFrame);
 	if (timeToWait > 0 && timeToWait <= millisecsPerFrame)
 	{
 		SDL_Delay(timeToWait);
 	}
-	double deltaTime = (SDL_GetTicks64() - millisecsPreFrame)/1000.0;
-	millisecsPreFrame = SDL_GetTicks64();
+	auto millisecsCurFrame = SDL_GetTicks64();
+	auto deltaTime = (millisecsCurFrame - millisecsPreFrame) / 1000.0;
+	millisecsPreFrame = millisecsCurFrame;
 
 	registry->Update();
 
@@ -173,7 +174,7 @@ void GameEngine::Run()
 	SetUp();
 	while (isRunning)
 	{
-		ProcessInput();
+		Input();
 		Update();
 		Render();
 	}

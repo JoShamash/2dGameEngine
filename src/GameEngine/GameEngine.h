@@ -9,13 +9,13 @@
 
 #include "../ECS/ECS.h"
 #include "../AssetStore/AssetStore.h"
-#include "../Logger/Logger.h"
 
 class GameEngine
 {
 public:
 	GameEngine();
 	~GameEngine();
+
 	void Initialize();
 	void Run();
 	void Destroy();
@@ -24,7 +24,7 @@ private:
 	void LoadLevel(int level);
 	void SetUp();
 
-	void ProcessInput();
+	void Input();
 	void Update();
 	void Render();
 	

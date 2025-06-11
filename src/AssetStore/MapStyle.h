@@ -26,7 +26,7 @@ public:
 		std::ifstream file(path);
 		if (!file.is_open())
 		{
-			std::string message = reinterpret_cast<const char*>(u8"地图样式文件打开失败：") + path;
+			std::string message = U8_TO_CHARPTR("地图样式文件打开失败：") + path;
 			Logger::Instance().Log(LogLevel::ERROR, message);
 			file.close();
 			return;
@@ -53,7 +53,7 @@ public:
 			}
 			else
 			{
-				std::string message = reinterpret_cast<const char*>(u8"地图样式文件pixel格式错误：") + path;
+				std::string message = U8_TO_CHARPTR("地图样式文件pixel格式错误：") + path;
 				Logger::Instance().Log(LogLevel::ERROR, message);
 				file.close();
 				return;
@@ -73,7 +73,7 @@ public:
 			}
 			else
 			{
-				std::string message = reinterpret_cast<const char*>(u8"地图样式文件range格式错误：") + path;
+				std::string message = U8_TO_CHARPTR("地图样式文件range格式错误：") + path;
 				Logger::Instance().Log(LogLevel::ERROR, message);
 				file.close();
 				return;
@@ -95,7 +95,7 @@ public:
 			}
 			else
 			{
-				std::string message = reinterpret_cast<const char*>(u8"地图样式文件scale格式错误：") + path;
+				std::string message = U8_TO_CHARPTR("地图样式文件scale格式错误：") + path;
 				Logger::Instance().Log(LogLevel::ERROR, message);
 				file.close();
 				return;
@@ -123,7 +123,7 @@ public:
 			// 检查地图样式表的高度是否与范围高度一致
 			if (map.size() != rangeY && map[0].size() != rangeX)
 			{
-				std::string message = reinterpret_cast<const char*>(u8"地图样式文件二维表格式错误：") + path;
+				std::string message = U8_TO_CHARPTR("地图样式文件二维表格式错误：") + path;
 				Logger::Instance().Log(LogLevel::ERROR, message);
 				map.clear();
 				pixelX = pixelY = rangeX = rangeY = scaleX = scaleY = 0;

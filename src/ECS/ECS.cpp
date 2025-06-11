@@ -1,10 +1,5 @@
 #include "ECS.h"
 
-glm::uint64 Entity::GetId() const 
-{
-	return id;
-}
-
 bool Entity::operator==(const Entity& other) const
 {
 	return id == other.id;
@@ -24,6 +19,8 @@ bool Entity::operator<(const Entity & other) const
 {
 	return id < other.id;
 }
+
+/*-------------------------------------------------------------------------------------------------*/
 
 void System::AddEntityToSystem(const Entity& entity)
 {
@@ -47,29 +44,31 @@ const Signature& System::GetComponentSignature() const
 	return componentSignature;
 }
 
+/*-------------------------------------------------------------------------------------------------*/
+
 Registry::Registry(glm::uint64 capacity)
 {
-	if (capacity < 128)
+	if (capacity < 16)
 	{
-		capacity = 128;
+		capacity = 16;
 	}
 	componentPools.resize(capacity);
-	entityComponentSignatures.resize(capacity);
+	componentSignatures.resize(capacity);
 }
 
-Entity& Registry::CreateEntity()
+Entity Registry::CreateEntity()
 {
 	glm::uint64 entityId = numEntities++;
 	Entity entity(entityId);
 	entity.registry = this;
 	entitiesToBeAdd.insert(entity);
 
-	if (entityId >= entityComponentSignatures.size())
+	if (entityId >= componentSignatures.size())
 	{
-		entityComponentSignatures.resize(entityId * 2);
+		componentSignatures.resize(entityId * 2);
 	}
 
-	std::string message = reinterpret_cast<const char*>(u8"创建实体(id=") + std::to_string(entityId) + ")";
+	std::string message = U8_TO_CHARPTR("创建实体(id=") + std::to_string(entityId) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
 	return entity;
 }
@@ -78,14 +77,14 @@ void Registry::DestroyEntity(const Entity& entity)
 {
 	entitiesToBeKill.insert(entity);
 
-	std::string message = reinterpret_cast<const char*>(u8"销毁实体(id=") + std::to_string(entity.GetId()) + ")";
+	std::string message = U8_TO_CHARPTR("销毁实体(id=") + std::to_string(entity.GetId()) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
 void Registry::AddEntityToSystem(const Entity& entity)
 {
 	const auto& entityId = entity.GetId();
-	const auto& entityComponentSignature = entityComponentSignatures[entityId];
+	const auto& entityComponentSignature = componentSignatures[entityId];
 	
 	for (const auto& [index, system] : systems)
 	{
@@ -99,6 +98,14 @@ void Registry::AddEntityToSystem(const Entity& entity)
 	}
 }
 
+void Registry::RemoveEntityFromSystem(const Entity& entity)
+{
+	for (const auto& [index, system] : systems)
+	{
+		system->RemoveEntityFromSystem(entity);
+	}
+}
+
 void Registry::Update()
 {
 	for (auto& entity : entitiesToBeAdd)
@@ -107,12 +114,9 @@ void Registry::Update()
 	}
 	entitiesToBeAdd.clear();
 
-	for (auto entity : entitiesToBeKill)
+	for (auto& entity : entitiesToBeKill)
 	{
-		for (const auto& [index, system] : systems)
-		{
-			system->RemoveEntityFromSystem(entity);
-		}
+		RemoveEntityFromSystem(entity);
 	}
 }
 

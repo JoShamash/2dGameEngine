@@ -5,10 +5,12 @@
 #include <SDL2/SDL.h>
 #include <string>  
 
+#include "../Logger/Logger.h"
+
 class SpriteComponent  
 {  
 public:  
-	inline const static std::string NAME = std::string("SpriteComponent") + reinterpret_cast<const char*>(u8"精灵组件"); // 组件名称  
+	inline const static std::string NAME = std::string("SpriteComponent") + U8_TO_CHARPTR("精灵组件"); // 组件名称  
 
 	std::string assetId; // 资源ID 
 	glm::f64vec2 size;   // 精灵大小，x为宽度，y为高度  
