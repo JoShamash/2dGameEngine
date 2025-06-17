@@ -32,6 +32,7 @@ private:
 private:
 	std::unique_ptr<Registry> registry;		// 实体组件注册表
 	std::unique_ptr<AssetStore> assetStore; // 资源存储器
+	std::unique_ptr<EventBus> eventBus;		// 事件总线
 
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;

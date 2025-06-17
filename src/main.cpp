@@ -6,8 +6,10 @@
 
 #define SDL_MAIN_HANDLED
 
-#include "GameEngine/GameEngine.h"
 #include <iostream>
+
+#include "GameEngine/GameEngine.h"
+
 
 int main(int argc, char* argv[])
 {
