@@ -1,5 +1,10 @@
 #include "ECS.h"
 
+void Entity::KillSelf() const
+{
+	registry->DestroyEntity(*this);
+}
+
 bool Entity::operator==(const Entity& other) const
 {
 	return id == other.id;
@@ -22,30 +27,6 @@ bool Entity::operator<(const Entity & other) const
 
 /*-------------------------------------------------------------------------------------------------*/
 
-void System::AddEntityToSystem(const Entity& entity)
-{
-	entities.push_back(entity);
-}
-
-void System::RemoveEntityFromSystem(const Entity& entity)
-{
-	entities.erase(std::remove_if(entities.begin(), entities.end(), [&entity](Entity& other) {
-		return entity == other;
-		}), entities.end());
-}
-
-const std::vector<Entity>& System::GetSystemEntities() const
-{
-	return entities;
-}
-
-const Signature& System::GetComponentSignature() const
-{
-	return componentSignature;
-}
-
-/*-------------------------------------------------------------------------------------------------*/
-
 Registry::Registry(glm::uint64 capacity)
 {
 	if (capacity < 16)
@@ -58,15 +39,25 @@ Registry::Registry(glm::uint64 capacity)
 
 Entity Registry::CreateEntity()
 {
-	glm::uint64 entityId = numEntities++;
-	Entity entity(entityId);
-	entity.registry = this;
-	entitiesToBeAdd.insert(entity);
-
-	if (entityId >= componentSignatures.size())
+	glm::uint64 entityId;
+	if (freeIds.empty())
 	{
-		componentSignatures.resize(entityId * 2);
+		entityId = numEntities++;
+
+		if (entityId >= componentSignatures.size())
+		{
+			componentSignatures.resize(entityId * 2);
+		}
 	}
+	else
+	{
+		entityId = freeIds.front();
+		freeIds.pop_front();
+	}
+
+	Entity entity(entityId, this);  // 创建实体对象，传入实体ID和注册表指针
+	entities.insert(entity);		// 将实体添加到实体集合中	
+	entitiesToBeAdd.insert(entity); // 将实体添加到待添加集合中
 
 	std::string message = U8_TO_CHARPTR("创建实体(id=") + std::to_string(entityId) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
@@ -75,17 +66,19 @@ Entity Registry::CreateEntity()
 
 void Registry::DestroyEntity(const Entity& entity)
 {
-	entitiesToBeKill.insert(entity);
+	entities.erase(entity);			 // 从实体集合中移除实体
+	entitiesToBeKill.insert(entity); // 将实体添加到待销毁集合中
 
 	std::string message = U8_TO_CHARPTR("销毁实体(id=") + std::to_string(entity.GetId()) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
 }
 
-void Registry::AddEntityToSystem(const Entity& entity)
+void Registry::AddEntityToSystems(const Entity& entity)
 {
 	const auto& entityId = entity.GetId();
 	const auto& entityComponentSignature = componentSignatures[entityId];
-	
+
+	// 添加实体到对应系统
 	for (const auto& [index, system] : systems)
 	{
 		const auto& systemComponentSignature = system->GetComponentSignature();
@@ -93,16 +86,17 @@ void Registry::AddEntityToSystem(const Entity& entity)
 		// 当实体的组件签名包含系统的组件签名匹配时，添加实体到系统。
 		if ((systemComponentSignature & entityComponentSignature) == systemComponentSignature)
 		{
-			system->AddEntityToSystem(entity);
+			system->AddEntity(entity);
 		}
 	}
 }
 
-void Registry::RemoveEntityFromSystem(const Entity& entity)
+void Registry::RemoveEntityFromSystems(const Entity& entity)
 {
+	// 从系统中移除实体
 	for (const auto& [index, system] : systems)
 	{
-		system->RemoveEntityFromSystem(entity);
+		system->RemoveEntity(entity);
 	}
 }
 
@@ -110,13 +104,17 @@ void Registry::Update()
 {
 	for (auto& entity : entitiesToBeAdd)
 	{
-		AddEntityToSystem(entity);
+		AddEntityToSystems(entity);
 	}
 	entitiesToBeAdd.clear();
 
 	for (auto& entity : entitiesToBeKill)
 	{
-		RemoveEntityFromSystem(entity);
-	}
-}
+		RemoveEntityFromSystems(entity);
 
+		const auto& id = entity.GetId();
+		componentSignatures[id].reset(); // 该实体组件签名重置
+		freeIds.push_back(id);			 // 释放实体ID以供后续使用
+	}
+	entitiesToBeKill.clear();
+}

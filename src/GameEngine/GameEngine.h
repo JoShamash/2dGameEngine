@@ -5,6 +5,7 @@
 #include <SDL2_image/SDL_image.h>
 #include <SDL2_mixer/SDL_mixer.h>
 #include <SDL2_ttf/SDL_ttf.h>
+#include <SDL2_gfx/SDL2_gfxPrimitives.h>
 #include <glm/glm.hpp>
 
 #include "../ECS/ECS.h"
@@ -39,9 +40,11 @@ private:
 	Uint64 windowWidth = 0;
 	Uint64 windowHeight = 0;
 
-	Uint64 fps = 120;
+	Uint64 fps = 60;
 	Uint64 millisecsPreFrame = 0;
-	Uint64 millisecsPerFrame = 1000 / 120;
+	Uint64 millisecsPerFrame = 1000 / fps;
+
+	bool isDebug = false;
 };
 
 

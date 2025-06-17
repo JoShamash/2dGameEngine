@@ -22,11 +22,11 @@ AssetStore::~AssetStore()
 // 清理特定图片资源
 void AssetStore::ClearImageAsset(const std::string& assetId)
 {
-    auto it = imageAssets.find(assetId); // 查找指定的资源 ID
-    if (it != imageAssets.end()) {
+    auto imageIt = imageAssets.find(assetId); // 查找指定的资源 ID
+    if (imageIt != imageAssets.end()) {
         // 释放资源
-        SDL_DestroyTexture(it->second);
-        imageAssets.erase(it);  // 从容器中移除该资源
+        SDL_DestroyTexture(imageIt->second);
+        imageAssets.erase(imageIt);  // 从容器中移除该资源
 
 		std::string message = U8_TO_CHARPTR("图片资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
         Logger::Instance().Log(LogLevel::INFO, message);
@@ -53,11 +53,11 @@ void AssetStore::ClearImageAssets()
 // 清理特定音频资源
 void AssetStore::ClearAudioAsset(const std::string& assetId)
 {
-    auto it = audioAssets.find(assetId); // 查找指定的资源 ID
-    if (it != audioAssets.end()) {
+    auto audioIt = audioAssets.find(assetId); // 查找指定的资源 ID
+    if (audioIt != audioAssets.end()) {
         // 释放音频资源
-        Mix_FreeMusic(it->second);
-        audioAssets.erase(it);  // 从容器中移除该资源
+        Mix_FreeMusic(audioIt->second);
+        audioAssets.erase(audioIt);  // 从容器中移除该资源
 
 		std::string message = U8_TO_CHARPTR("音频资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
         Logger::Instance().Log(LogLevel::INFO, message);
@@ -84,11 +84,11 @@ void AssetStore::ClearAudioAssets()
 // 清理特定音效资源
 void AssetStore::ClearSoundEffectAsset(const std::string& assetId)
 {
-    auto it = soundEffectAssets.find(assetId); // 查找指定的资源 ID
-    if (it != soundEffectAssets.end()) {
+    auto soundEffectIt = soundEffectAssets.find(assetId); // 查找指定的资源 ID
+    if (soundEffectIt != soundEffectAssets.end()) {
         // 释放音效资源
-        Mix_FreeChunk(it->second);
-        soundEffectAssets.erase(it);  // 从容器中移除该资源
+        Mix_FreeChunk(soundEffectIt->second);
+        soundEffectAssets.erase(soundEffectIt);  // 从容器中移除该资源
         
 		std::string message = U8_TO_CHARPTR("音效资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
 		Logger::Instance().Log(LogLevel::INFO, message);
@@ -115,11 +115,11 @@ void AssetStore::ClearSoundEffectAssets()
 // 清理特定字体资源
 void AssetStore::ClearFontAsset(const std::string& assetId)
 {
-    auto it = fontAssets.find(assetId); // 查找指定的资源 ID
-    if (it != fontAssets.end()) {
+    auto fontIt = fontAssets.find(assetId); // 查找指定的资源 ID
+    if (fontIt != fontAssets.end()) {
         // 释放字体资源
-        TTF_CloseFont(it->second);
-        fontAssets.erase(it);  // 从容器中移除该资源
+        TTF_CloseFont(fontIt->second);
+        fontAssets.erase(fontIt);  // 从容器中移除该资源
 
 		std::string message = U8_TO_CHARPTR("字体资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
 		Logger::Instance().Log(LogLevel::INFO, message);
@@ -146,11 +146,11 @@ void AssetStore::ClearFontAssets()
 // 清理特定地图样式资源
 void AssetStore::ClearMapStyleAsset(const std::string& assetId)
 {
-	auto it = mapStyleAssets.find(assetId); // 查找指定的资源 ID
-	if (it != mapStyleAssets.end()) {
+	auto mapStyleIt = mapStyleAssets.find(assetId); // 查找指定的资源 ID
+	if (mapStyleIt != mapStyleAssets.end()) {
 		// 释放地图样式资源
-		delete it->second;
-		mapStyleAssets.erase(it);  // 从容器中移除该资源
+		delete mapStyleIt->second;
+		mapStyleAssets.erase(mapStyleIt);  // 从容器中移除该资源
 		std::string message = U8_TO_CHARPTR("地图样式资源 ") + assetId + U8_TO_CHARPTR(" 已清理");
 		Logger::Instance().Log(LogLevel::INFO, message);
 	}
@@ -168,6 +168,7 @@ void AssetStore::ClearMapStyleAssets()
 		delete asset;  // 释放每个地图样式资源
 	}
 	mapStyleAssets.clear(); // 清空容器
+
 	std::string message = U8_TO_CHARPTR("已清理所有地图样式资源");
 	Logger::Instance().Log(LogLevel::INFO, message);
 }

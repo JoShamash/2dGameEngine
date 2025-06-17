@@ -60,6 +60,12 @@
     <ClCompile Include="src\AssetStore\AssetStore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Components\AnimationComponent.h">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Components\BoxColliderComponent.h">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SDL3\SDL.h">
@@ -1541,13 +1547,22 @@
     <ClInclude Include="src\Components\SpriteComponent.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\Systems\RenderSystem.h">
+    <ClInclude Include="src\Systems\RenderEntitySystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\AssetStore\AssetStore.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\AssetStore\MapStyle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\AnimationSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\CollisionSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\RenderColliderSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

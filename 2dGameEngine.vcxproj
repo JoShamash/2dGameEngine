@@ -29,6 +29,8 @@
     <ClCompile Include="include\imgui\imgui_impl_sdlrenderer2.cpp" />
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Components\AnimationComponent.h" />
+    <ClCompile Include="src\Components\BoxColliderComponent.h" />
     <ClCompile Include="src\Components\RigidBodyComponent.h" />
     <ClCompile Include="src\ECS\ECS.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
@@ -530,8 +532,11 @@
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\GameEngine\GameEngine.h" />
+    <ClInclude Include="src\Systems\AnimationSystem.h" />
+    <ClInclude Include="src\Systems\CollisionSystem.h" />
     <ClInclude Include="src\Systems\MovementSystem.h" />
-    <ClInclude Include="src\Systems\RenderSystem.h" />
+    <ClInclude Include="src\Systems\RenderColliderSystem.h" />
+    <ClInclude Include="src\Systems\RenderEntitySystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\glm\detail\func_common.inl" />
@@ -732,7 +737,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>..\2dGameEngine\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\2dGameEngine\lib\SDL2_mixer\x64;..\2dGameEngine\lib\SDL2_ttf\x64;..\2dGameEngine\lib\SDL2_image\x64;..\2dGameEngine\lib\SDL2\x64;..\2dGameEngine\lib\Lua;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\2dGameEngine\lib\SDL2_mixer\x64;..\2dGameEngine\lib\SDL2_ttf\x64;..\2dGameEngine\lib\SDL2_image\x64;..\2dGameEngine\lib\SDL2\x64;..\2dGameEngine\lib\Lua;..\2dGameEngine\lib\SDL2_gfx\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -792,7 +797,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_gfx.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -8,16 +8,15 @@
 
 #include "../Logger/Logger.h"
 
-class MapStyle
+struct MapStyle
 {
-public:
-	std::string path;  // 地图路径
-	size_t pixelX = 0; // 像素宽度
-	size_t pixelY = 0; // 像素高度
-	size_t rangeX = 0; // 范围宽度
-	size_t rangeY = 0; // 范围高度
-	size_t scaleX = 0; // 瓦片宽度缩放
-	size_t scaleY = 0; // 瓦片高度缩放
+	std::string path;  // 地图资源路径
+	size_t pixelX = 0; // 资源的像素宽度
+	size_t pixelY = 0; // 资源的像素高度
+	size_t rangeX = 0; // 资源生成的范围，横向个数
+	size_t rangeY = 0; // 资源生成的范围，纵向个数
+	size_t scaleX = 0; // 资源瓦片宽度缩放比例
+	size_t scaleY = 0; // 资源瓦片高度缩放比例
 
 	std::vector<std::vector<size_t>> map; // 地图样式表
 
@@ -120,15 +119,13 @@ public:
 				lineNum++;
 			}
 
-			// 检查地图样式表的高度是否与范围高度一致
+			// 检查地图样式表的高度和宽度是否与范围高度和宽度一致
 			if (map.size() != rangeY && map[0].size() != rangeX)
 			{
-				std::string message = U8_TO_CHARPTR("地图样式文件二维表格式错误：") + path;
+				std::string message = U8_TO_CHARPTR("地图样式文件二维表格式错误，高度或宽度与地图不一致：") + path;
 				Logger::Instance().Log(LogLevel::ERROR, message);
 				map.clear();
 				pixelX = pixelY = rangeX = rangeY = scaleX = scaleY = 0;
-				file.close();
-				return;
 			}
 		}
 		file.close();

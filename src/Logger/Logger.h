@@ -23,12 +23,12 @@
 */
 enum class LogLevel : uint8_t 
 {
-    TRACE,  ///< 跟踪信息，最详细
-    DEBUG,  ///< 调试信息
-    INFO,   ///< 一般信息
-    WARN,   ///< 警告信息
-    ERROR,  ///< 错误信息
-    FATAL   ///< 严重错误，通常导致程序中止
+    TRACE,  // 跟踪信息，最详细
+    DEBUG,  // 调试信息
+    INFO,   // 一般信息
+    WARN,   // 警告信息
+    ERROR,  // 错误信息
+    FATAL   // 严重错误，通常导致程序中止
 };
 
 /**
@@ -116,48 +116,48 @@ public:
 	void setSourceFileTrace(bool sourceFileTrace);
 
 private:
-    Logger() = default;  ///< 私有构造函数，确保单例
+    Logger() = default;  // 私有构造函数，确保单例
 
     /// @brief 内部封装的日志消息结构
     struct LogMessage 
     {
-        std::string message;                                      ///< 完整的日志文本
-        LogLevel level;                                           ///< 日志级别
-        std::chrono::system_clock::time_point timestamp;          ///< 生成时间
+        std::string message;                                      // 完整的日志文本
+        LogLevel level;                                           // 日志级别
+        std::chrono::system_clock::time_point timestamp;          // 生成时间
     };
 
     // —————— 配置和状态 ——————
-    std::atomic<bool> running_{ false };             ///< 后台线程运行状态
-    std::atomic<LogLevel> level_{ LogLevel::INFO };  ///< 当前日志级别阈值
-    std::atomic<bool> async_{ true };                ///< 是否异步写日志
-    std::atomic<bool> isTerminal_{ true };           ///< 是否输出到终端
-	std::atomic<bool> sourceFileTrace_{ false };     ///< 是否输出源文件位置
+    std::atomic<bool> running_{ false };             // 后台线程运行状态
+    std::atomic<LogLevel> level_{ LogLevel::INFO };  // 当前日志级别阈值
+    std::atomic<bool> async_{ true };                // 是否异步写日志
+    std::atomic<bool> isTerminal_{ true };           // 是否输出到终端
+	std::atomic<bool> sourceFileTrace_{ false };     // 是否输出源文件位置
 
-    std::ofstream logFile_;                      ///< 当前打开的日志文件流
-    std::string logDir_;                         ///< 日志目录
-    size_t maxFileSize_{ 0 };                    ///< 单文件最大尺寸
-    size_t maxFiles_{ 0 };                       ///< 最大文件数量
+    std::ofstream logFile_;                      // 当前打开的日志文件流
+    std::string logDir_;                         // 日志目录
+    size_t maxFileSize_{ 0 };                    // 单文件最大尺寸
+    size_t maxFiles_{ 0 };                       // 最大文件数量
 
     // —————— 异步队列相关 ——————
-    std::queue<LogMessage> logQueue_;          ///< 待写入日志队列
-    std::mutex queueMutex_;                    ///< 队列互斥锁
-    std::condition_variable condition_;        ///< 队列通知条件
-    std::thread workerThread_;                 ///< 后台写日志线程
+    std::queue<LogMessage> logQueue_;          // 待写入日志队列
+    std::mutex queueMutex_;                    // 队列互斥锁
+    std::condition_variable condition_;        // 队列通知条件
+    std::thread workerThread_;                 // 后台写日志线程
 
     // —————— 文件轮转状态 ——————
-    std::string currentFilename_;              ///< 当前日志文件名
-    size_t currentFileSize_{ 0 };              ///< 当前文件已写入大小
-    std::mutex fileMutex_;                     ///< 文件操作互斥锁
-	std::mutex rotateMutex_; 			       ///< 轮转操作互斥锁
+    std::string currentFilename_;              // 当前日志文件名
+    size_t currentFileSize_{ 0 };              // 当前文件已写入大小
+    std::mutex fileMutex_;                     // 文件操作互斥锁
+	std::mutex rotateMutex_; 			       // 轮转操作互斥锁
 
     // —————— 内部方法 ——————
-    void Worker();                                       ///< 异步写入线程入口
-    void RotateFile();                                   ///< 轮转日志文件
-    void WriteToFile(const std::string& message);        ///< 真正的写文件（和终端）操作
-    std::string LevelToString(LogLevel level);           ///< 将级别转为文本
-    std::string GetTimeStamp();                          ///< 获取当前时间戳字符串
-    std::string GetThreadId();                           ///< 获取当前线程 ID 字符串
-    std::string RemoveAnsiCodes(const std::string& str); ///< 去除ANSI转义字符
+    void Worker();                                       // 异步写入线程入口
+    void RotateFile();                                   // 轮转日志文件
+    void WriteToFile(const std::string& message);        // 真正的写文件（和终端）操作
+    std::string LevelToString(LogLevel level);           // 将级别转为文本
+    std::string GetTimeStamp();                          // 获取当前时间戳字符串
+    std::string GetThreadId();                           // 获取当前线程 ID 字符串
+    std::string RemoveAnsiCodes(const std::string& str); // 去除ANSI转义字符
 };
 
 
