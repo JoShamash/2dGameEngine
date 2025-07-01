@@ -29,7 +29,7 @@ class Registry; // 前向声明注册表类
 class Entity 
 {
 public:
-	Entity(glm::uint64 id, Registry* registry = nullptr) : id(id), registry(registry) {};
+	Entity(glm::uint64 id = -1) : id(id){};
 	Entity(const Entity& entity) = default;
 	~Entity() = default;
 
@@ -46,16 +46,52 @@ public:
 	}
 
 	// 设置实体的注册表指针
-	inline void SetRegistry(Registry* registryPtr)
+	inline static void SetRegistry(Registry* registryPtr)
 	{
 		registry = registryPtr;
 	}
+
+	// 获取实体的注册表指针
+	inline static Registry* GetRegistry()
+	{
+		return registry;
+	}
+
+	// 实体添加tag标签
+	void AddTag(const std::string& input) const;
+
+	// 实体修改tag标签
+	void ChangeTag(const std::string& input) const;
+
+	// 实体移除tag标签
+	void RemoveTag() const;
+
+	// 检查实体是否有tag标签
+	bool HasTag(const std::string& input) const;
+
+	// 通过实体获取tag标签
+	const std::string& GetTag() const;
+
+	// 实体添加group组名
+	void AddGroup(const std::string& input) const;
+
+	// 实体修改group组名
+	void ChangeGroup(const std::string& input) const;
+
+	// 实体移除group组名
+	void RemoveGroup() const;
+
+	// 检查实体是否有group组名
+	bool HasGroup(const std::string& input) const;
+
+	// 通过实体获取group组名
+	const std::string& GetGroup() const;
 
 	// 释放实体
 	void KillSelf() const;
 
 	// 添加组件
-	template <class TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
+	template <class TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args) const;
 
 	// 移除组件
 	template <class TComponent> void RemoveComponent() const;
@@ -69,7 +105,7 @@ public:
 private:
 	glm::uint64 id; // 实体唯一标识符
 
-	Registry* registry = nullptr; // 注册表指针，用于访问注册表
+	inline static Registry* registry = nullptr; // 注册表指针，用于访问注册表
 };
 
 //    ____                                                              _   
@@ -236,6 +272,48 @@ public:
 	// 更新注册表，处理添加和删除的实体
 	void Update();
 
+	// 是否存在tag标签
+	bool HasTag(const std::string& tag) const;
+
+	// 是否存在group标签
+	bool HasGroup(const std::string& group) const;
+
+	// 实体添加tag标签
+	void EntityAddTag(const Entity& entity, const std::string& tag);
+
+	// 实体修改tag标签
+	void EntityChangeTag(const Entity& entity, const std::string& tag);
+
+	// 实体移除tag标签
+	void EntityRemoveTag(const Entity& entity);
+
+	// 检查实体是否有tag标签
+	bool EntityHasTag(const Entity& entity, const std::string& tag) const;
+
+	// 通过实体获取tag标签
+	const std::string& GetTagByEntity(const Entity& entity) const;
+
+	// 通过tag标签获取实体
+	const Entity& GetEntityByTag(const std::string& tag) const;
+
+	// 实体添加group组名
+	void EntityAddGroup(const Entity& entity, const std::string& group);
+
+	// 实体修改group组名
+	void EntityChangeGroup(const Entity& entity, const std::string& group);
+
+	// 实体移除group组名
+	void EntityRemoveGroup(const Entity& entity);
+
+	// 检查实体是否有group组名
+	bool EntityHasGroup(const Entity& entity, const std::string& group) const;
+
+	// 通过实体获取group组名
+	const std::string& GetGroupByEntity(const Entity& entity) const;
+
+	// 通过group组名获取实体集合
+	const std::set<Entity>& GetEntitiesByGroup(const std::string& group) const;
+
 	// entity实体添加相应组件
 	template <class TComponent, typename ...TArgs> void AddComponent(const Entity& entity, TArgs&& ...args);
 
@@ -260,16 +338,29 @@ public:
 	// 获取引擎某一系统
 	template <class TSystem> TSystem& GetSystem() const;
 
+private:
+	// string转大写
+	static std::string to_lower(std::string str);
+
+	// string转大写
+	static std::string to_upper(std::string str);
+
 private:  
 	glm::uint64 numEntities = 0;		// 当前实体数量，同时也代表下一个实体ID
 	std::set<Entity> entities;			// 实体集合，存储所有存在的实体
-	std::set<Entity> entitiesToBeAdd;   // 待添加的实体集合
-	std::set<Entity> entitiesToBeKill;  // 待销毁的实体集合
+	std::set<Entity> entitiesToBeAdd;   // 系统待添加的实体集合
+	std::set<Entity> entitiesToBeKill;  // 系统待销毁的实体集合
 	std::deque<glm::uint64> freeIds;	// 可用的空闲ID，当实体销毁时ID存入
 
-	std::vector<std::shared_ptr<IPool>> componentPools;					   // 组件池集合，存储对应组件的组件池，下标为组件类型ID，eg. componentPools[componentId][entityId]
-	std::vector<Signature> componentSignatures;							   // 组件签名集合，存储对应实体的组件签名，下标为实体ID，eg. componentSignatures[entityId]
-	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;  // 系统集合，存储所有系统，key为系统类型
+	std::vector<std::shared_ptr<IPool>> componentPools;						// 组件池集合，存储对应组件的组件池，下标为组件类型ID，eg. componentPools[componentId][entityId]
+	std::vector<Signature> componentSignatures;								// 组件签名集合，存储对应实体的组件签名，下标为实体ID，eg. componentSignatures[entityId]
+	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;	// 系统集合，存储所有系统，key为系统类型
+
+	// 标签和实体一一对应，组名和实体属于一对多的关系
+	std::unordered_map<std::string, Entity> tagEntityMap;					// tag标签唯一，通过标签找到实体
+	std::unordered_map<glm::uint64, std::string> entityTagMap;				// entity唯一，通过实体ID找到标签
+	std::unordered_map<std::string, std::set<Entity>> groupEntitiesMap;		// group组名唯一，通过组名找到实体集合
+	std::unordered_map<glm::uint64, std::string> entityGroupMap;			// entity唯一，通过实体ID找到组名
 };
 
 //   _____                              _           _          
@@ -443,7 +534,7 @@ const TComponent& Pool<TComponent>::operator[](glm::uint64 index) const
 /// <typeparam name="TArgs">组件构造函数参数类型</typeparam>
 /// <param name="args">组件构造函数参数</param>
 template<class TComponent, typename ...TArgs>
-inline void Entity::AddComponent(TArgs&& ...args)
+inline void Entity::AddComponent(TArgs&& ...args) const
 {
 	registry->AddComponent<TComponent>(*this, std::forward<TArgs>(args)...);
 }

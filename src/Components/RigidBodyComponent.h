@@ -2,6 +2,7 @@
 #define RIGIDBODYCOMPONENT_H
 
 #include <glm/glm.hpp>
+#include <SDL2/SDL.h>
 #include <string>
 
 #include "../Logger/Logger.h"
@@ -15,14 +16,17 @@ struct RigidBodyComponent
 	inline const static std::string NAME = std::string("RigidBodyComponent") + U8_TO_CHARPTR("刚体组件"); // 组件名称
 
 
-	glm::f64vec2 volocity; // 速度，单位：像素/秒，(x，y)正方向为右下角
+	Uint64 speed;			// 速率，单位：像素/秒
+	glm::f64vec2 velocity;	// 速度标准化矢量方向
+	
 
 	/**
 	* @brief 构造函数
-	* @param volocity 初始速度，默认为(0, 0)
+	* @param speed 
+	* @param velocity 初始速度标准化矢量，默认为(0, 0)，始终保证velocity.x^2+velocity.y^2=1
 	*/
-	RigidBodyComponent(glm::f64vec2 volocity = {0, 0})
-		: volocity(volocity) { }
+	RigidBodyComponent(Uint64 speed = 0, glm::f64vec2 velocity = {0, 0})
+		: speed(speed), velocity(velocity) { }
 };
 
 #endif // !RIGIDBODYCOMPONENT_H

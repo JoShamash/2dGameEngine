@@ -43,6 +43,17 @@ enum class RenderLayer : Uint8
     Count                 // 层数
 };
 
+// 定义方向贴图枚举，不同方向选择不同贴图，贴图格式为从左到右是帧动画，从上到下是方向贴图（↑→↓←）
+enum class DirectionTexture : Uint8
+{
+    Up = 0,               // 向上移动的贴图索引
+    Right,                // 向右移动的贴图索引
+    Down,                 // 向下移动的贴图索引
+    Left,                 // 向左移动的贴图索引
+
+    Count                 // 索引个数
+};
+
 /**
 * @struct SpriteComponent
 * @brief 精灵组件，用于存储精灵的资源ID、大小、渲染层和源矩形区域
@@ -53,7 +64,7 @@ struct SpriteComponent
 
 
 	std::string assetId; // 资源ID 
-	glm::f64vec2 size;   // 精灵大小，x为宽度，y为高度  
+	glm::u64vec2 size;   // 精灵大小，x为宽度，y为高度  
     RenderLayer layer;   // 渲染层
     SDL_Rect srcRect;	 // 源矩形区域，用于渲染时的裁剪
 
@@ -65,7 +76,7 @@ struct SpriteComponent
 	* @param layer 渲染层，默认为RenderLayer::Characters
 	* @param position 源矩形的左上角位置，默认为(0, 0)
     */
-	SpriteComponent(std::string assetId = "", glm::f64vec2 size = {0, 0}, RenderLayer layer = RenderLayer::Characters, glm::f64vec2 position = {0, 0})
+	SpriteComponent(std::string assetId = "", glm::u64vec2 size = {0, 0}, RenderLayer layer = RenderLayer::Characters, glm::u64vec2 position = {0, 0})
 		: size(size), assetId(assetId), layer(layer), srcRect(position.x, position.y, size.x, size.y) { }
 };  
 

@@ -31,6 +31,8 @@
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Components\AnimationComponent.h" />
     <ClCompile Include="src\Components\BoxColliderComponent.h" />
+    <ClCompile Include="src\Components\HealthComponent.h" />
+    <ClCompile Include="src\Components\KeyboardControlComponent.h" />
     <ClCompile Include="src\Components\RigidBodyComponent.h" />
     <ClCompile Include="src\ECS\ECS.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
@@ -527,19 +529,32 @@
     <ClInclude Include="include\sol\forward.hpp" />
     <ClInclude Include="include\sol\sol.hpp" />
     <ClInclude Include="src\AssetStore\MapStyle.h" />
+    <ClInclude Include="src\Camera\Camera.h" />
+    <ClInclude Include="src\Components\CameraFollowComponent.h" />
+    <ClInclude Include="src\Components\CampComponent.h" />
+    <ClInclude Include="src\Components\ProjectileComponent.h" />
+    <ClInclude Include="src\Components\ProjectileEmitterComponent.h" />
     <ClInclude Include="src\Components\SpriteComponent.h" />
     <ClInclude Include="src\Components\TransformComponent.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\EventBus\Event.h" />
     <ClInclude Include="src\EventBus\EventBus.h" />
     <ClInclude Include="src\Events\CollisionEvent.h" />
+    <ClInclude Include="src\Events\KeyPressedEvent.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\GameEngine\GameEngine.h" />
     <ClInclude Include="src\Systems\AnimationSystem.h" />
+    <ClInclude Include="src\Systems\CameraMovementSystem.h" />
     <ClInclude Include="src\Systems\CollisionSystem.h" />
+    <ClInclude Include="src\Systems\DamageSystem.h" />
+    <ClInclude Include="src\Systems\HealthSystem.h" />
+    <ClInclude Include="src\Systems\KeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\MovementSystem.h" />
+    <ClInclude Include="src\Systems\ProjectileEmitSystem.h" />
+    <ClInclude Include="src\Systems\ProjectileLifeCycleSystem.h" />
     <ClInclude Include="src\Systems\RenderColliderSystem.h" />
     <ClInclude Include="src\Systems\RenderEntitySystem.h" />
+    <ClInclude Include="src\Time\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\glm\detail\func_common.inl" />

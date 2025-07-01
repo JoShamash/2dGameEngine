@@ -10,6 +10,9 @@
 
 #include "../ECS/ECS.h"
 #include "../AssetStore/AssetStore.h"
+#include "../EventBus/EventBus.h"
+#include "../Camera/Camera.h"
+#include "../Time/Timer.h"
 
 class GameEngine
 {
@@ -36,16 +39,23 @@ private:
 
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
+	Camera camera = {};
+	Timer timer = {};
 
 	bool isRunning = true;
-	Uint64 windowWidth = 0;
-	Uint64 windowHeight = 0;
+	bool isPause = false;
+	bool isResume = false;
 
 	Uint64 fps = 60;
-	Uint64 millisecsPreFrame = 0;
-	Uint64 millisecsPerFrame = 1000 / fps;
+	double frameTime = 1000 / fps;
 
 	bool isDebug = false;
+
+public:
+	inline static Uint64 windowWidth = 0;
+	inline static Uint64 windowHeight = 0;
+	inline static Uint64 mapWidth = 0;
+	inline static Uint64 mapHeight = 0;
 };
 
 

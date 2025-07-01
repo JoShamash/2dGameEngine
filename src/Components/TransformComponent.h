@@ -2,6 +2,7 @@
 #define TRANSFORMCOMPONENT_H
 
 #include <glm/glm.hpp>
+#include <SDL2/SDL.h>
 #include <string>
 
 #include "../Logger/Logger.h"

@@ -2,51 +2,71 @@
 #define EVNETBUS_H
 
 #include <map>
-#include <list>
+#include <unordered_set>
 #include <typeindex>
 
 #include "../ECS/ECS.h"
 #include "Event.h"
 
+//   _____                          _      ____           _   _   ____                   _    
+//  | ____| __   __   ___   _ __   | |_   / ___|   __ _  | | | | | __ )    __ _    ___  | | __
+//  |  _|   \ \ / /  / _ \ | '_ \  | __| | |      / _` | | | | | |  _ \   / _` |  / __| | |/ /
+//  | |___   \ V /  |  __/ | | | | | |_  | |___  | (_| | | | | | | |_) | | (_| | | (__  |   < 
+//  |_____|   \_/    \___| |_| |_|  \__|  \____|  \__,_| |_| |_| |____/   \__,_|  \___| |_|\_\
+                                                                                            
+// 事件回调类的接口父类
 class IEventCallBack
 {
 public:
 	IEventCallBack() = default;
-	virtual ~IEventCallBack() = 0;
+	virtual ~IEventCallBack() = default;
 
+	// 触发事件后执行回调函数
 	void ExecuteEvent(Event& e)
 	{
-		CallEvent(e);
+		CallBackEvent(e);
 	}
 
 private:
-	virtual void CallEvent(Event& e) = 0;
+	// 纯虚函数，事件的回调函数
+	virtual void CallBackEvent(Event& e) = 0;
 };
 
-template <class TOwner, class TEvent>
+// CallBackFunc类型，TOwner类的函数指针，函数参数为TEvent&
+template <class TEvent, class TOwner>
 using CallBackFunc = void (TOwner::*)(TEvent&);
 
+// 具体事件回调类
 template <class TOwner, class TEvent>
-class EventCallBack : IEventCallBack
+class EventCallBack : public IEventCallBack
 {
 public:
-	EventCallBack(TOwner* owner, CallBackFunc callbackFunc) 
+	EventCallBack(TOwner* owner, CallBackFunc<TEvent, TOwner> callbackFunc)
 		: owner(owner), callbackFunc(callbackFunc) { };
 
 	virtual ~EventCallBack() override = default;
 
 private:
-	TOwner* owner;
-	CallBackFunc<TOwner, TEvent> callbackFunc;
+	TOwner* owner;								// 具体调用类
+	CallBackFunc<TEvent, TOwner> callbackFunc;	// 调用类的回调函数
 
-	virtual void CallEvent(Event& e) override
+	// 调用owner的回调函数callbackFunc
+	virtual void CallBackEvent(Event& event) override
 	{
-		std::invoke(callbackFunc, owner, static_cast<TEvent>(e));
+		std::invoke(callbackFunc, owner, static_cast<TEvent&>(event));
 	}
 };
 
-using HandlerList = std::list<std::unique_ptr<IEventCallBack>>;
+// HandlerList类型，负责维护所有事件回调类列表
+using Handlers = std::vector<std::unique_ptr<IEventCallBack>>;
 
+//   _____                          _     ____                
+//  | ____| __   __   ___   _ __   | |_  | __ )   _   _   ___ 
+//  |  _|   \ \ / /  / _ \ | '_ \  | __| |  _ \  | | | | / __|
+//  | |___   \ V /  |  __/ | | | | | |_  | |_) | | |_| | \__ \
+//  |_____|   \_/    \___| |_| |_|  \__| |____/   \__,_| |___/
+                                       
+// 事件总线，负责事件的订阅与触发事件后分发
 class EventBus
 {
 public:
@@ -62,40 +82,48 @@ public:
 		Logger::Instance().Log(LogLevel::INFO, message);
 	}
 
-	template <class TOwner, class TEvent>
-	void SubscribeEvent(TOwner* owner, CallBackFunc<TOwner, TEvent> callbackFunc)
+	// 重置事件总线，清空所有订阅者
+	void Reset()
 	{
-		if (!subscribers[typeid(TEvent)])
+		subscribers.clear();
+	}
+
+	// 订阅事件，owner为订阅者对象，callbackFunc为回调函数
+	template <class TEvent, class TOwner>
+	void SubscribeEvent(TOwner* owner, CallBackFunc<TEvent, TOwner> callbackFunc)
+	{
+		// 如果该事件类型还没有订阅者列表，则创建一个新的列表
+		if (!subscribers[typeid(TEvent)].get())
 		{
-			subscribers[typeid(TEvent)] = std::make_unique<HandlerList>();
+			subscribers[typeid(TEvent)] = std::make_unique<Handlers>();
 		}
 
+		// 创建事件回调对象并添加到订阅者列表
 		auto subscriber = std::make_unique<EventCallBack<TOwner, TEvent>>(owner, callbackFunc);
-		subscribers[typeid(TEvent)]->push_back(std::move(subscriber));
+		subscribers[typeid(TEvent)]->emplace_back(std::move(subscriber));
 	}
-	 
+  
+	// 触发事件后发布，args为事件构造参数
 	template <class TEvent, typename ...TArgs>
 	void EmitEvent(TArgs&& ...args)
 	{
-		auto& handlerListPtr = subscribers[typeid(TEvent)].get();
-		if (handlerListPtr)
+		auto handlersPtr = subscribers[typeid(TEvent)].get();
+		if (handlersPtr)
 		{
-			auto& handlerList = *handlerListPtr;
-			for (auto& handlerUniquePtr : handlerList)
+			auto& handlers = *handlersPtr;
+			// 遍历事件回调列表的事件回调对象
+			for (auto& handlerUniquePtr : handlers)
 			{
-				auto& handlerPtr = handlerUniquePtr.get();
-				if (handlerPtr)
-				{
-					auto& handler = *handlerPtr;
-					TEvent event(std::forward<TArgs>(args)...);
-					handler.ExecuteEvent(event);
-				}
+				auto& handler = *handlerUniquePtr;
+				TEvent event(std::forward<TArgs>(args)...);
+				handler.ExecuteEvent(event);
 			}
 		}
 	}
 
 private:
-	std::map<std::type_index, std::unique_ptr<HandlerList>> subscribers;
+	// 事件类型到事件处理回调列表的映射
+	std::map<std::type_index, std::unique_ptr<Handlers>> subscribers;
 };
 
 #endif // !EVNETBUS_H

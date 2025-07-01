@@ -6,10 +6,11 @@
 
 #include "../ECS/ECS.h"
 #include "../AssetStore/AssetStore.h"
+#include "../Camera/Camera.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
 
-// 渲染实体系统类，负责渲染实体的图像到屏幕上
+// 渲染实体系统类，定义一系列逻辑接口，负责渲染实体的图像到屏幕上
 class RenderEntitySystem : public System
 {
 public:
@@ -29,9 +30,11 @@ public:
 	* @param renderer SDL 渲染器，用于渲染图像
 	* @param assetStore 资源存储，用于获取图像资源
 	*/
-	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore)
+	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore, const Camera& camera)
 	{
 		std::multimap<RenderLayer, Entity> entities; // 存储渲染系统中的实体，按渲染层分类
+
+		SDL_Rect window = {0, 0, camera.w, camera.h};
 
 		for (const auto& entity : GetEntities())
 		{
@@ -43,6 +46,7 @@ public:
 		{
 			auto& transformComponent = entity.GetComponent<TransformComponent>();
 			auto& spriteComponent = entity.GetComponent<SpriteComponent>();
+			auto& layer = spriteComponent.layer;
 			
 			SDL_Rect srcRect = spriteComponent.srcRect;
 
@@ -52,6 +56,18 @@ public:
 				static_cast<int>(spriteComponent.size.x * transformComponent.scale.x),
 				static_cast<int>(spriteComponent.size.y * transformComponent.scale.y)
 			};
+
+
+			if (layer < RenderLayer::UIBackground)
+			{
+				dstRect.x -= camera.x;
+				dstRect.y -= camera.y;
+			}
+
+			if (!SDL_HasIntersection(&dstRect, &window))
+			{
+				continue;
+			}
 
 			SDL_RenderCopyEx(
 				renderer, 

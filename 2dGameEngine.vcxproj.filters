@@ -66,6 +66,12 @@
     <ClCompile Include="src\Components\BoxColliderComponent.h">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Components\KeyboardControlComponent.h">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Components\HealthComponent.h">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SDL3\SDL.h">
@@ -1572,6 +1578,45 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\EventBus\Event.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\DamageSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\KeyboardControlSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Events\KeyPressedEvent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\CameraFollowComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\CameraMovementSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\ProjectileEmitterComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\ProjectileEmitSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\ProjectileComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\ProjectileLifeCycleSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\CampComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Time\Timer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\HealthSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

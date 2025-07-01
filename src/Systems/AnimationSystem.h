@@ -5,8 +5,9 @@
 #include "../AssetStore/AssetStore.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
+#include "../Time/Timer.h"
 
-// 动画系统类，负责处理帧动画
+// 动画系统类，定义一系列逻辑接口，负责处理帧动画
 class AnimationSystem : public System
 {
 public:
@@ -35,7 +36,7 @@ public:
 			const auto& frameSpeed = animationComponent.frameSpeed;
 			const auto& numFrames = animationComponent.numFrames;
 			auto& currentFrame = animationComponent.currentFrame;
-			currentFrame = ((SDL_GetTicks64() - startTime) * frameSpeed / 1000) % numFrames;
+			currentFrame = ((Timer::time.gameTime - startTime) * frameSpeed / 1000) % numFrames;
 
 			const auto& size = spriteComponent.size;
 			auto& srcRect = spriteComponent.srcRect;

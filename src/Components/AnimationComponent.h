@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <SDL2/SDL.h>
 
+#include "../Time/Timer.h"
 #include "../Logger/Logger.h"
 
 /**
@@ -25,15 +26,10 @@ struct AnimationComponent
 	/** @brief 构造函数
 	* @param numFrames 总帧数
 	* @param frameSpeed 帧速率（每秒多少帧）
-	* @param isLooping 是否循环播放
+	* @param isLooping 是否循环播放 
 	*/
 	AnimationComponent(Uint64 numFrames = 0, Uint64 frameSpeed = 0, bool isLooping = true)
-		: numFrames(numFrames), currentFrame(0), frameSpeed(frameSpeed), isLooping(isLooping), startTime(SDL_GetTicks64()) { }
+		: numFrames(numFrames), currentFrame(0), frameSpeed(frameSpeed), isLooping(isLooping), startTime(Timer::time.gameTime) { }
 };
-
-
-
-
-
 
 #endif // !ANIMATIONCOMPONENT_H

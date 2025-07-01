@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <sstream> 
 
-// 运动系统类，负责处理实体的运动逻辑
+// 运动系统类，定义一系列逻辑接口，负责处理实体的运动逻辑
 class MovementSystem : public System 
 {
 public:
@@ -27,15 +27,15 @@ public:
 	* @brief 更新运动状态，处理实体的运动逻辑
 	* @param deltaTime 时间增量，表示自上次更新以来经过的时间
 	*/
-	void Update(double deltaTime)
+	void Update()
 	{
 		for (const auto& entity : GetEntities())
 		{
 			auto& transformComponent = entity.GetComponent<TransformComponent>();
 			auto& rigidBodyComponent = entity.GetComponent<RigidBodyComponent>();
 			
-			transformComponent.position.x += rigidBodyComponent.volocity.x * deltaTime;
-			transformComponent.position.y += rigidBodyComponent.volocity.y * deltaTime;
+			transformComponent.position.x += rigidBodyComponent.velocity.x * rigidBodyComponent.speed * Timer::time.deltaTime / 1000.0;
+			transformComponent.position.y += rigidBodyComponent.velocity.y * rigidBodyComponent.speed * Timer::time.deltaTime / 1000.0;
 
 			//std::ostringstream oss;
 			//oss << U8_TO_CHARPTR("更新，实体(id=") << entity.GetId()
