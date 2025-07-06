@@ -38,7 +38,7 @@ public:
 	*/
 	void UnSubscribeEvents(std::unique_ptr<EventBus>& eventBus)
 	{
-		
+		eventBus->DisSubscribeEvent<CollisionEvent>(this, &DamageSystem::OnCollision);
 	}
 
 	/**

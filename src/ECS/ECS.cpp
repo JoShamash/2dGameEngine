@@ -82,25 +82,17 @@ bool Entity::operator<(const Entity & other) const
 
 Registry::Registry(glm::uint64 capacity)
 {
-	if (capacity < 16)
-	{
-		capacity = 16;
-	}
-	componentPools.resize(capacity);
-	componentSignatures.resize(capacity);
+	componentPools.reserve(capacity);
+	componentSignatures.reserve(capacity);
 }
 
 Entity Registry::CreateEntity()
 {
+	// 分配实体ID
 	glm::uint64 entityId;
 	if (freeIds.empty())
 	{
-		entityId = numEntities++;
-
-		if (entityId >= componentSignatures.size())
-		{
-			componentSignatures.resize(entityId * 2);
-		}
+		entityId = numEntities;
 	}
 	else
 	{
@@ -108,17 +100,27 @@ Entity Registry::CreateEntity()
 		freeIds.pop_front();
 	}
 
+	// 初始化该实体的组件签名
+	entityIdToSignaturesIdxMap[entityId] = numEntities;
+	signaturesIdxToEntityIdMap[numEntities] = entityId;
+	componentSignatures.emplace_back();
+	numEntities++;
+
 	Entity entity(entityId);		// 创建实体对象，传入实体ID和注册表指针
 	entities.insert(entity);		// 将实体添加到实体集合中	
 	entitiesToBeAdd.insert(entity); // 将实体添加到待添加集合中
 
 	std::string message = U8_TO_CHARPTR("创建实体(id=") + std::to_string(entityId) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
+
 	return entity;
 }
 
 void Registry::DestroyEntity(const Entity& entity)
 {
+	const auto& entityId = entity.GetId();
+	const auto& signatureIdx = entityIdToSignaturesIdxMap[entityId];
+
 	entities.erase(entity);				// 从实体集合中移除实体
 	entitiesToBeKill.insert(entity);	// 将实体添加到待销毁集合中
 	entity.RemoveTag();					// 清除绑定的tag标签
@@ -131,9 +133,11 @@ void Registry::DestroyEntity(const Entity& entity)
 void Registry::AddEntityToSystems(const Entity& entity)
 {
 	const auto& entityId = entity.GetId();
-	const auto& entityComponentSignature = componentSignatures[entityId];
 
-	// 添加实体到对应系统
+	const auto& signatureIdx = entityIdToSignaturesIdxMap[entityId];
+	const auto& entityComponentSignature = componentSignatures[signatureIdx];
+
+	// 添加实体到符合条件的系统
 	for (const auto& [index, system] : systems)
 	{
 		const auto& systemComponentSignature = system->GetComponentSignature();
@@ -157,19 +161,40 @@ void Registry::RemoveEntityFromSystems(const Entity& entity)
 
 void Registry::Update()
 {
+	// 添加实体到系统
 	for (auto& entity : entitiesToBeAdd)
 	{
 		AddEntityToSystems(entity);
 	}
 	entitiesToBeAdd.clear();
 
+	// 
 	for (auto& entity : entitiesToBeKill)
 	{
 		RemoveEntityFromSystems(entity);
 
-		const auto& id = entity.GetId();
-		componentSignatures[id].reset(); // 该实体组件签名重置
-		freeIds.push_back(id);			 // 释放实体ID以供后续使用
+		const auto& entityId = entity.GetId();
+		const auto& signatureIdx = entityIdToSignaturesIdxMap[entityId];
+
+		// 注意：释放组件操作需在所有系统更新之前或之后
+		// 释放实体ID的所有组件
+		const auto& signature = componentSignatures[signatureIdx];
+		for (auto& componentPool : componentPools)
+		{
+			componentPool->Remove(entityId);
+		}
+
+		// 删除该实体组件签名
+		const auto& lastEntityId = signaturesIdxToEntityIdMap[--numEntities];
+		entityIdToSignaturesIdxMap[lastEntityId] = signatureIdx;
+		signaturesIdxToEntityIdMap[signatureIdx] = lastEntityId;
+		entityIdToSignaturesIdxMap.erase(entityId);
+		signaturesIdxToEntityIdMap.erase(numEntities);
+		componentSignatures[signatureIdx] = componentSignatures.back();
+		componentSignatures.pop_back();
+
+		// 释放实体ID以供后续使用
+		freeIds.push_back(entityId);
 	}
 	entitiesToBeKill.clear();
 }

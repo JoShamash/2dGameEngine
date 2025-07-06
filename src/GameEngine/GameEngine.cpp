@@ -350,9 +350,9 @@ void GameEngine::Update()
 
 	registry->Update();
 
-	registry->GetSystem<MovementSystem>().Update();
 	registry->GetSystem<ProjectileEmitSystem>().Update(registry);
 	registry->GetSystem<ProjectileLifeCycleSystem>().Update();
+	registry->GetSystem<MovementSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventBus);
 	registry->GetSystem<HealthSystem>().Update();
 	registry->GetSystem<AnimationSystem>().Update();

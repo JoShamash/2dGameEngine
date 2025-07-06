@@ -151,15 +151,30 @@ public:
 	// 添加实体到系统
 	inline void AddEntity(const Entity& entity)
 	{
+		auto id = entity.GetId();
 		entities.push_back(entity);
+		idToIdxMap[id] = entitySize;
+		idxToIdMap[entitySize] = id;
+		entitySize++;
 	}
 
 	// 移除实体从系统
 	inline void RemoveEntity(const Entity& entity)
 	{
-		entities.erase(std::remove_if(entities.begin(), entities.end(), [&entity](Entity& other) {
-			return entity == other;
-			}), entities.end());
+		auto id = entity.GetId();
+		if(idToIdxMap.find(id) != idToIdxMap.end())
+		{
+			auto idx = idToIdxMap[id];
+			auto lastEntityId = idxToIdMap[--entitySize];
+
+			idToIdxMap[lastEntityId] = idx;
+			idxToIdMap[idx] = lastEntityId;
+			idToIdxMap.erase(id);
+			idxToIdMap.erase(entitySize);
+
+			entities[idx] = entities.back();
+			entities.pop_back();
+		}
 	}
 
 	// 获取系统中的实体列表
@@ -184,8 +199,11 @@ public:
 	template <class TComponent> bool HasComponent() const;
 
 private:
-	Signature componentSignature; // 系统的组件签名
-	std::vector<Entity> entities; // 系统管理的实体列表
+	glm::uint64 entitySize = 0;									// 系统管理的实体列表的个数	
+	Signature componentSignature;								// 系统的组件签名
+	std::vector<Entity> entities;								// 系统管理的实体列表
+	std::unordered_map<glm::uint64, glm::uint64> idToIdxMap;	// 通过实体ID找到entities对应的下标
+	std::unordered_map<glm::uint64, glm::uint64> idxToIdMap;	// 通过entities对应的下标找到实体ID
 };
 
 //   ____                    _ 
@@ -200,6 +218,9 @@ class IPool
 public:
 	IPool() = default;
 	virtual ~IPool() = default;
+
+	// 通过实体ID移除组件从组件池
+	virtual void Remove(glm::uint64 entityId) = 0;
 };
 
 // 组件池模板类，表示引擎中的相应组件类型的组件池
@@ -207,7 +228,7 @@ template <class TComponent>
 class Pool: public IPool
 {
 public:
-	Pool(glm::uint64 capacity = 16);
+	Pool() = default;
 	virtual ~Pool() = default;
 
 	// 组件池是否为空
@@ -216,32 +237,44 @@ public:
 	// 获取组件池的组件数量
 	inline glm::uint64 GetSize() const;
 
-	// 重新调整组件池大小
-	inline void Resize(glm::uint64 size);
+	// 初始化组件池的容量
+	inline void Reserve(glm::uint64 capacity = 1024)
+	{
+		data.reserve(capacity);
+	}
 	
 	// 清空组件池
 	inline void Clear();
 
-	// 添加组件到组件池
-	inline void Add(TComponent component);
+	// 添加组件到组件池末尾
+	inline void Push_back(TComponent component);
 
-	// 通过实体ID设置组件到组件池，组件池的下标与实体ID一致
+	// 删除组件从组件池末尾
+	inline void Pop_back();
+	
+	// 通过实体ID设置组件到组件池
 	inline void Set(glm::uint64 entityId, TComponent component);
 
-	// 获取组件池中对应下标的组件，即实体ID对应的组件
-	inline TComponent& Get(glm::uint64 index);
+	// 通过实体ID移除组件从组件池
+	inline void Remove(glm::uint64 entityId) override;
 
-	// 获取组件池中对应下标的组件，即实体ID对应的组件, const版本
-	inline const TComponent& Get(glm::uint64 index) const;
+	// 获取组件池中实体对应的组件
+	inline TComponent& Get(glm::uint64 entityId);
 
-	// 获取组件池中对应下标的组件
-	inline TComponent& operator[](glm::uint64 index);
+	// 获取组件池中实体对应的组件, const版本
+	inline const TComponent& Get(glm::uint64 entityId) const;
 
-	// 获取组件池中对应下标的组件，const版本
-	inline const TComponent& operator[](glm::uint64 index) const;
+	// 获取组件池中对应实体ID的组件
+	inline TComponent& operator[](glm::uint64 entityId);
+
+	// 获取组件池中对应实体ID的组件，const版本
+	inline const TComponent& operator[](glm::uint64 entityId) const;
 
 private:
-	std::vector<TComponent> data; // 组件池数据，下标为实体ID，存储不同实体ID对应的TComponent类型组件
+	glm::uint64 componentSize = 0;										// 当前组件池的组件数量
+	std::vector<TComponent> data;										// 组件池数据，下标为实体ID，存储不同实体ID对应的TComponent类型组件
+	std::unordered_map<glm::uint64, glm::uint64> idToComponentIdxMap;	// 通过entityID找到componentPool对应的component下标
+	std::unordered_map<glm::uint64, glm::uint64> componentIdxToIdMap;	// 通过componentPool对应的component下标找到entityID
 };
 
 //   ____                   _         _                  
@@ -254,7 +287,7 @@ private:
 class Registry 
 {
 public:
-	Registry(glm::uint64 capacity = 16);
+	Registry(glm::uint64 capacity = 1024);
 	~Registry() = default;
 
 	// 创建entity实体
@@ -321,10 +354,10 @@ public:
 	template <class TComponent> void RemoveComponent(const Entity& entity);
 
 	// 检查entity实体是否有相应组件
-	template <class TComponent> bool HasComponent(const Entity& entity) const;
+	template <class TComponent> bool HasComponent(const Entity& entity);
 
 	// 获取entity实体的相应组件
-	template <class TComponent> TComponent& GetComponent(const Entity& entity) const;
+	template <class TComponent> TComponent& GetComponent(const Entity& entity);
 
 	// 引擎添加相应系统
 	template <class TSystem, typename ...TArgs> void AddSystem(TArgs&& ...args);
@@ -339,7 +372,7 @@ public:
 	template <class TSystem> TSystem& GetSystem() const;
 
 private:
-	// string转大写
+	// string转小写
 	static std::string to_lower(std::string str);
 
 	// string转大写
@@ -347,20 +380,26 @@ private:
 
 private:  
 	glm::uint64 numEntities = 0;		// 当前实体数量，同时也代表下一个实体ID
+	glm::uint64 numComponents = 0;		// 当前组件种类个数
 	std::set<Entity> entities;			// 实体集合，存储所有存在的实体
 	std::set<Entity> entitiesToBeAdd;   // 系统待添加的实体集合
 	std::set<Entity> entitiesToBeKill;  // 系统待销毁的实体集合
 	std::deque<glm::uint64> freeIds;	// 可用的空闲ID，当实体销毁时ID存入
 
-	std::vector<std::shared_ptr<IPool>> componentPools;						// 组件池集合，存储对应组件的组件池，下标为组件类型ID，eg. componentPools[componentId][entityId]
-	std::vector<Signature> componentSignatures;								// 组件签名集合，存储对应实体的组件签名，下标为实体ID，eg. componentSignatures[entityId]
-	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;	// 系统集合，存储所有系统，key为系统类型
+	std::unordered_map<glm::uint64, glm::uint64> componentIdToPoolIdxMap;			// 通过组件ID找到componentPools对应的componentPool下标
+	std::unordered_map<glm::uint64, glm::uint64> poolIdxToComponentIdMap;			// 通过componentPools对应的componentPool下标找到组件ID
+	std::unordered_map<glm::uint64, glm::uint64> entityIdToSignaturesIdxMap;		// 通过实体ID找到componentSignatures对应下标
+	std::unordered_map<glm::uint64, glm::uint64> signaturesIdxToEntityIdMap;		// 通过componentSignatures对应下标找到实体ID
 
-	// 标签和实体一一对应，组名和实体属于一对多的关系
-	std::unordered_map<std::string, Entity> tagEntityMap;					// tag标签唯一，通过标签找到实体
-	std::unordered_map<glm::uint64, std::string> entityTagMap;				// entity唯一，通过实体ID找到标签
-	std::unordered_map<std::string, std::set<Entity>> groupEntitiesMap;		// group组名唯一，通过组名找到实体集合
-	std::unordered_map<glm::uint64, std::string> entityGroupMap;			// entity唯一，通过实体ID找到组名
+	std::vector<std::shared_ptr<IPool>> componentPools;								// 组件池集合，存储对应组件的组件池，下标为组件类型ID，eg. componentPools[componentId][entityId]
+	std::vector<Signature> componentSignatures;										// 组件签名集合，存储对应实体的组件签名，下标为实体ID，eg. componentSignatures[entityId]
+	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;			// 系统集合，存储所有系统，key为系统类型
+
+	// 标签和实体属于一一对应的关系，组名和实体属于一对多的关系
+	std::unordered_map<std::string, Entity> tagEntityMap;							// tag标签唯一，通过标签找到实体
+	std::unordered_map<glm::uint64, std::string> entityTagMap;						// entity唯一，通过实体ID找到标签
+	std::unordered_map<std::string, std::set<Entity>> groupEntitiesMap;				// group组名唯一，通过组名找到实体集合
+	std::unordered_map<glm::uint64, std::string> entityGroupMap;					// entity唯一，通过实体ID找到组名
 };
 
 //   _____                              _           _          
@@ -375,21 +414,6 @@ private:
 //   | |  | | | | | | | |_) | | | |  __/ | | | | | | |  __/ | | | | | |_  | (_| | | |_  | | | (_) | | | | |
 //  |___| |_| |_| |_| | .__/  |_|  \___| |_| |_| |_|  \___| |_| |_|  \__|  \__,_|  \__| |_|  \___/  |_| |_|
 //                    |_|                                                                                  
-/// <summary>
-/// 组件池模板类，表示引擎中的相应组件类型的组件池
-/// </summary>
-/// <typeparam name="TComponent">组件类型</typeparam>
-/// <param name="capacity">组件池初始容量</param>
-template <class TComponent>
-Pool<TComponent>::Pool(glm::uint64 capacity)
-{
-	if (capacity < 16)
-	{
-		capacity = 16;
-	}
-	data.resize(capacity); // 初始化组件池数据，设置初始容量
-}
-
 /// <summary>
 ///	组件池是否为空
 /// </summary>
@@ -409,18 +433,7 @@ bool Pool<TComponent>::IsEmpty() const
 template <class TComponent>
 glm::uint64 Pool<TComponent>::GetSize() const
 {
-	return data.size();
-}
-
-/// <summary>
-/// 重新调整组件池大小
-/// </summary>
-/// <typeparam name="TComponent">组件类型</typeparam>
-/// <param name="size">新的大小</param>
-template <class TComponent>
-void Pool<TComponent>::Resize(glm::uint64 size)
-{
-	data.resize(size);
+	return componentSize;
 }
 
 /// <summary>
@@ -431,17 +444,30 @@ template <class TComponent>
 void Pool<TComponent>::Clear()
 {
 	data.clear();
+	componentSize = 0;
 }
 
 /// <summary>
-/// 添加特定组件到组件池
+/// 添加组件到组件池末尾
 /// </summary>
 /// <typeparam name="TComponent"></typeparam>
 /// <param name="component"></param>
 template <class TComponent>
-void Pool<TComponent>::Add(TComponent component)
+void Pool<TComponent>::Push_back(TComponent component)
 {
 	data.push_back(component);
+	componentSize++;
+}
+
+/// <summary>
+/// 删除组件从组件池末尾
+/// </summary>
+/// <typeparam name="TComponent"></typeparam>
+template <class TComponent>
+void Pool<TComponent>::Pop_back()
+{
+	data.pop_back();
+	componentSize--;
 }
 
 /// <summary>
@@ -453,75 +479,114 @@ void Pool<TComponent>::Add(TComponent component)
 template <class TComponent>
 void Pool<TComponent>::Set(glm::uint64 entityId, TComponent component)
 {
-	// 如果实体ID大于组件池的大小，则扩容组件池
-	if (entityId >= GetSize())
+	if(idToComponentIdxMap.find(entityId) == idToComponentIdxMap.end())
 	{
-		data.resize(entityId * 2);
+		idToComponentIdxMap[entityId] = componentSize;
+		componentIdxToIdMap[componentSize] = entityId;
+		Push_back(component);
 	}
+	else
+	{
+		glm::uint64 idx = idToComponentIdxMap[entityId];
+		data[idx] = component;
+	}
+}
 
-	// 组件池中对应实体ID下标的组件设置为传入的组件
-	data[entityId] = component;
+template<class TComponent>
+inline void Pool<TComponent>::Remove(glm::uint64 entityId)
+{
+	if (idToComponentIdxMap.find(entityId) != idToComponentIdxMap.end())
+	{
+		glm::uint64 idx = idToComponentIdxMap[entityId];
+		glm::uint64 lastEntityId = componentIdxToIdMap[componentSize - 1];
+
+		idToComponentIdxMap[lastEntityId] = idx;
+		componentIdxToIdMap[idx] = lastEntityId;
+		idToComponentIdxMap.erase(entityId);
+		componentIdxToIdMap.erase(componentSize - 1);
+
+		data[idx] = data.back(); 
+		Pop_back();
+	}
 }
 
 /// <summary>
-/// 获取组件池中对应下标的组件，即实体ID对应的组件
+/// 获取组件池中实体对应的组件
 /// </summary>
 /// <typeparam name="TComponent"></typeparam>
-/// <param name="index"></param>
+/// <param name="entityId"></param>
 /// <returns>组件的引用</returns>
 template <class TComponent>
-TComponent& Pool<TComponent>::Get(glm::uint64 index)
+TComponent& Pool<TComponent>::Get(glm::uint64 entityId)
 {
 	// 检查下标是否越界
-	if (index >= data.size())
+	if (idToComponentIdxMap.find(entityId) != idToComponentIdxMap.end())
 	{
-		std::string message = U8_TO_CHARPTR("错误：组件池下标越界，尝试访问的下标为") + std::to_string(index);
-		Logger::Instance().Log(LogLevel::ERROR, message);
-		throw std::out_of_range("Index out of bounds");
+		glm::uint64 index = idToComponentIdxMap[entityId];
+		if (index >= componentSize)
+		{
+			std::string message = U8_TO_CHARPTR("错误：组件池下标越界，尝试访问的下标为") + std::to_string(index);
+			Logger::Instance().Log(LogLevel::ERROR, message);
+			throw std::out_of_range("Index out of bounds");
+		}
+		return data[index];
 	}
-	return data[index];
+	else
+	{
+		throw std::out_of_range("entityId has no component");
+	}
 }
 
 /// <summary>
-/// 获取组件池中对应下标的组件，即实体ID对应的组件, const版本
+/// 获取组件池中实体对应的组件, const版本
 /// </summary>
 /// <typeparam name="TComponent"></typeparam>
-/// <param name="index"></param>
+/// <param name="entityId"></param>
 /// <returns>组件的引用</returns>
 template <class TComponent> 
-const TComponent& Pool<TComponent>::Get(glm::uint64 index) const
+const TComponent& Pool<TComponent>::Get(glm::uint64 entityId) const
 {
 	// 检查下标是否越界
-	if (index >= data.size())
+	if (idToComponentIdxMap.find(entityId) != idToComponentIdxMap.end())
 	{
-		std::string message = U8_TO_CHARPTR("错误：组件池下标越界，尝试访问的下标为") + std::to_string(index);
-		Logger::Instance().Log(LogLevel::ERROR, message);
-		throw std::out_of_range("Index out of bounds");
+		glm::uint64 index = idToComponentIdxMap.at(entityId);
+		if (index >= componentSize)
+		{
+			std::string message = U8_TO_CHARPTR("错误：组件池下标越界，尝试访问的下标为") + std::to_string(index);
+			Logger::Instance().Log(LogLevel::ERROR, message);
+			throw std::out_of_range("Index out of bounds");
+		}
+		return data[index];
 	}
-	return data[index];
+	else
+	{
+		throw std::out_of_range("entityId has no component");
+	}
 }
 
 /// <summary>
-/// 获取组件池中对应下标(实体ID)的组件
+/// 获取组件池中对应实体ID的组件
 /// </summary>
 /// <typeparam name="TComponent"></typeparam>
 /// <param name="index"></param>
 /// <returns>组件的引用</returns>
 template <class TComponent>
-TComponent& Pool<TComponent>::operator[](glm::uint64 index)
+TComponent& Pool<TComponent>::operator[](glm::uint64 entityId)
 {
+	glm::uint64 index = idToComponentIdxMap[entityId];
 	return data[index];
 }
 
 /// <summary>
-/// 获取组件池中对应下标(实体ID)的组件，const版本
+/// 获取组件池中对应实体ID的组件，const版本
 /// </summary>
 /// <typeparam name="TComponent"></typeparam>
 /// <param name="index"></param>
 /// <returns>组件的引用</returns>
 template <class TComponent>
-const TComponent& Pool<TComponent>::operator[](glm::uint64 index) const
+const TComponent& Pool<TComponent>::operator[](glm::uint64 entityId) const
 {
+	glm::uint64 index = idToComponentIdxMap.at(entityId);
 	return data[index];
 }
 
@@ -580,7 +645,7 @@ inline TComponent& Entity::GetComponent() const
 template <class TComponent>
 inline void System::RequireComponent()
 {
-	const auto componentId = Component<TComponent>::GetId();
+	const glm::uint64 componentId = Component<TComponent>::GetId();
 	componentSignature.set(componentId);
 }
 
@@ -591,7 +656,7 @@ inline void System::RequireComponent()
 template <class TComponent>
 inline void System::DisRequireComponent()
 {
-	const auto componentId = Component<TComponent>::GetId();
+	const glm::uint64 componentId = Component<TComponent>::GetId();
 	componentSignature.reset(componentId);
 }
 
@@ -603,7 +668,7 @@ inline void System::DisRequireComponent()
 template <class TComponent>
 inline bool System::HasComponent() const
 {
-	const auto componentId = Component<TComponent>::GetId();
+	const glm::uint64 componentId = Component<TComponent>::GetId();
 	return componentSignature.test(componentId);
 }
 
@@ -619,25 +684,31 @@ inline bool System::HasComponent() const
 template<class TComponent, typename ...TArgs>
 inline void Registry::AddComponent(const Entity& entity, TArgs&& ...args)
 {
-	const auto componentId = Component<TComponent>::GetId();
-	const auto entityId = entity.GetId();
-
-	if (componentId >= componentPools.size())
-	{
-		componentPools.resize(componentId * 2, nullptr);
-	}
-
-	if (componentPools[componentId] == nullptr)
+	const glm::uint64 componentId = Component<TComponent>::GetId();
+	const glm::uint64 entityId = entity.GetId();
+	
+	// 未找到组件池则创建该类型组件池
+	if (componentIdToPoolIdxMap.find(componentId) == componentIdToPoolIdxMap.end())
 	{
 		std::shared_ptr<Pool<TComponent>> newComponentPool = std::make_shared<Pool<TComponent>>();
-		componentPools[componentId] = newComponentPool;
-	}
+		newComponentPool->Reserve();
 
-	std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+		componentPools.push_back(newComponentPool);
+
+		componentIdToPoolIdxMap[componentId] = numComponents;
+		poolIdxToComponentIdMap[numComponents] = componentId;
+		numComponents++; 
+	}
+	
+	// 将该组件添加到组件池中
+	glm::uint64 poolIdx = componentIdToPoolIdxMap[componentId];
+	std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[poolIdx]);
 	TComponent newComponent(std::forward<TArgs>(args)...);
 	componentPool->Set(entityId, newComponent);
 
-	componentSignatures[entityId].set(componentId);
+	// 设置该实体的组件标签
+	glm::uint64 signatureIdx = entityIdToSignaturesIdxMap[entityId];
+	componentSignatures[signatureIdx].set(componentId);
 
 	std::string message = U8_TO_CHARPTR("添加") + TComponent::NAME + U8_TO_CHARPTR("到实体(id=") + std::to_string(entityId) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
@@ -650,9 +721,20 @@ inline void Registry::AddComponent(const Entity& entity, TArgs&& ...args)
 template<class TComponent>
 inline void Registry::RemoveComponent(const Entity& entity)
 {
-	const auto componentId = Component<TComponent>::GetId();
-	const auto entityId = entity.GetId();
-	componentSignatures[entityId].reset(componentId);
+	const glm::uint64 componentId = Component<TComponent>::GetId();
+	const glm::uint64 entityId = entity.GetId();
+
+	// 移除对应组件池中的该实体组件
+	if (componentIdToPoolIdxMap.find(componentId) != componentIdToPoolIdxMap.end())
+	{
+		glm::uint64 poolIdx = componentIdToPoolIdxMap[componentId];
+		std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[poolIdx]);
+		componentPool->Remove(entityId);
+	}
+
+	// 设置该实体的组件标签
+	glm::uint64 signatureIdx = entityIdToSignaturesIdxMap[entityId];
+	componentSignatures[signatureIdx].reset(componentId);
 
 	std::string message = U8_TO_CHARPTR("移除") + TComponent::NAME + U8_TO_CHARPTR("从实体(id=") + std::to_string(entityId) + ")";
 	Logger::Instance().Log(LogLevel::INFO, message);
@@ -664,11 +746,14 @@ inline void Registry::RemoveComponent(const Entity& entity)
 /// <typeparam name="TComponent">组件类型</typeparam>
 /// <param name="entity">实体</param>
 template<class TComponent>
-inline bool Registry::HasComponent(const Entity& entity) const
+inline bool Registry::HasComponent(const Entity& entity)
 {
-	const auto componentId = Component<TComponent>::GetId();
-	const auto entityId = entity.GetId();
-	return componentSignatures[entityId].test(componentId);
+	const glm::uint64 componentId = Component<TComponent>::GetId();
+	const glm::uint64 entityId = entity.GetId();
+
+	// 获取该实体的组件签名并检查
+	glm::uint64 signatureIdx = entityIdToSignaturesIdxMap[entityId];
+	return componentSignatures[signatureIdx].test(componentId);
 }
 
 /// <summary>
@@ -678,12 +763,14 @@ inline bool Registry::HasComponent(const Entity& entity) const
 /// <param name="entity">实体</param>
 /// <returns>组件的引用</returns>
 template<class TComponent>
-inline TComponent& Registry::GetComponent(const Entity& entity) const
+inline TComponent& Registry::GetComponent(const Entity& entity)
 {
-	const auto componentId = Component<TComponent>::GetId();
-	const auto entityId = entity.GetId();
+	const glm::uint64 componentId = Component<TComponent>::GetId();
+	const glm::uint64 entityId = entity.GetId();
 
-	auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+	// 从对应的组件池获取该实体组件
+	glm::uint64 poolIndex = componentIdToPoolIdxMap[componentId];
+	std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[poolIndex]);
 	return componentPool->Get(entityId);
 }
 

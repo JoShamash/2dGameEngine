@@ -46,6 +46,16 @@ public:
 
 	virtual ~EventCallBack() override = default;
 
+	inline TOwner* GetOwner()
+	{
+		return owner;
+	}
+
+	inline CallBackFunc<TEvent, TOwner> GetCallbackFunc()
+	{
+		return callbackFunc;
+	}
+
 private:
 	TOwner* owner;								// 具体调用类
 	CallBackFunc<TEvent, TOwner> callbackFunc;	// 调用类的回调函数
@@ -102,6 +112,36 @@ public:
 		auto subscriber = std::make_unique<EventCallBack<TOwner, TEvent>>(owner, callbackFunc);
 		subscribers[typeid(TEvent)]->emplace_back(std::move(subscriber));
 	}
+
+	// 取消订阅事件，owner为订阅者对象，callbackFunc为回调函数
+	template <class TEvent, class TOwner>
+	void DisSubscribeEvent(TOwner* owner, CallBackFunc<TEvent, TOwner> callbackFunc)
+	{
+		auto handlersPtr = subscribers[typeid(TEvent)].get();
+		if (!handlersPtr)
+		{
+			return; // 如果没有订阅者列表，则直接返回
+		}
+		// 从订阅者列表中移除匹配的事件回调对象
+		auto& handlers = *handlersPtr;
+		handlers.erase(
+			std::remove_if(handlers.begin(), handlers.end(),
+				[owner, callbackFunc](const std::unique_ptr<IEventCallBack>& handler)
+				{
+					// 尝试将 handler 转换为我们想要的具体类型
+					auto concreteHandler = dynamic_cast<EventCallBack<TOwner, TEvent>*>(handler.get());
+					if (concreteHandler)
+					{
+						// 检查 owner 和 callbackFunc 是否匹配
+						return concreteHandler->GetOwner() == owner && concreteHandler->GetCallbackFunc() == callbackFunc;
+					}
+					return false;
+				}
+			),
+			handlers.end()
+		);
+	}
+
   
 	// 触发事件后发布，args为事件构造参数
 	template <class TEvent, typename ...TArgs>
