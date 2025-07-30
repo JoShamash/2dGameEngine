@@ -12,6 +12,7 @@
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/ProjectileComponent.h"
 #include "../Components/CampComponent.h"
+#include "../Components/EntityLifeCycleComponent.h"
 #include "../EventBus/EventBus.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Time/Timer.h"
@@ -76,6 +77,7 @@ public:
 						projectile.AddComponent<BoxColliderComponent>(boxColliderComponent1);
 						projectile.AddComponent<ProjectileComponent>(projectileComponent1);
 						projectile.AddComponent<CampComponent>(campComponent1);
+						projectile.AddComponent<EntityLifeCycleComponent>();
 
 						projectileEmitterComponent.lastEmissionTime = Timer::time.gameTime;
 					}
@@ -93,7 +95,7 @@ public:
 			auto& projectileEmitterComponent = entity.GetComponent<ProjectileEmitterComponent>();
 			if (projectileEmitterComponent.isEmit == false || projectileEmitterComponent.projectileDuration == 0 || projectileEmitterComponent.repeatFrequency == 0)
 			{
-				return;
+				continue;
 			}
 
 			const auto& transformComponent = entity.GetComponent<TransformComponent>();
@@ -122,6 +124,7 @@ public:
 				projectile.AddComponent<BoxColliderComponent>(boxColliderComponent1);
 				projectile.AddComponent<ProjectileComponent>(projectileComponent1);
 				projectile.AddComponent<CampComponent>(campComponent1);
+				projectile.AddComponent<EntityLifeCycleComponent>();
 
 				projectileEmitterComponent.lastEmissionTime = Timer::time.gameTime;
 			}

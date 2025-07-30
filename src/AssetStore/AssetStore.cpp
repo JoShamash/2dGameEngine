@@ -1,8 +1,16 @@
 #include "AssetStore.h"
+#include <fstream>
 
 // 构造函数：初始化资源管理器，并进行日志记录
 AssetStore::AssetStore()
 {
+    // 加载图片json信息
+    std::ifstream imageJsonFile("./assets/images/image.json");
+    if (imageJsonFile.is_open()) {
+        imageJsonFile >> imageJson;
+        imageJsonFile.close();
+    }
+
     // 创建资源管理器时记录日志
     std::string message = U8_TO_CHARPTR("创建资源管理器");
     Logger::Instance().Log(LogLevel::INFO, message);
@@ -216,6 +224,10 @@ void AssetStore::AddImageAsset(SDL_Renderer* renderer, const std::string& assetI
     // 将纹理添加到资源容器中
 	imageAssets.emplace(assetId, texture);
 
+	// 添加图片信息到容器中
+	std::string fileName = path.substr(path.find_last_of("/\\") + 1); // 获取文件名
+    imageInfos.emplace(assetId, ImageInfo{ imageJson[fileName]["width"], imageJson[fileName]["height"]});
+    
 	std::string message = U8_TO_CHARPTR("加载图片资源：资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);
 }
@@ -521,3 +533,136 @@ MapStyle* AssetStore::GetMapStyleAsset(const std::string& assetId)
 		return nullptr; // 资源不存在，返回空指针
 	}
 }
+
+// 获取所有图片资源 ID 列表
+std::vector<std::string> AssetStore::GetAllImageAssetIds(SortFlag flag) const
+{
+    std::vector<std::string> ids;
+    for (const auto& [id, texture] : imageAssets) 
+    {
+        ids.push_back(id);
+    }
+    // 根据 flag 参数进行排序
+    if (flag == SortFlag::ASCENDING)
+    {
+        std::sort(ids.begin(), ids.end()); // 升序排序
+    }
+    else if (flag == SortFlag::DESCENDING)
+    {
+        std::sort(ids.rbegin(), ids.rend()); // 降序排序
+    }
+	return ids;
+}
+
+// 获取所有音频资源 ID 列表
+std::vector<std::string> AssetStore::GetAllAudioAssetIds(SortFlag flag) const
+{
+    std::vector<std::string> ids;
+    for (const auto& [id, texture] : audioAssets) {
+        ids.push_back(id);
+    }
+    // 根据 flag 参数进行排序
+    if (flag == SortFlag::ASCENDING)
+    {
+        std::sort(ids.begin(), ids.end()); // 升序排序
+    }
+    else if (flag == SortFlag::DESCENDING)
+    {
+        std::sort(ids.rbegin(), ids.rend()); // 降序排序
+    }
+    return ids;
+}
+
+// 获取所有音效资源 ID 列表
+std::vector<std::string> AssetStore::GetAllSoundEffectAssetIds(SortFlag flag) const
+{
+    std::vector<std::string> ids;
+    for (const auto& [id, texture] : soundEffectAssets) {
+        ids.push_back(id);
+    }
+    // 根据 flag 参数进行排序
+    if (flag == SortFlag::ASCENDING)
+    {
+        std::sort(ids.begin(), ids.end()); // 升序排序
+    }
+    else if (flag == SortFlag::DESCENDING)
+    {
+        std::sort(ids.rbegin(), ids.rend()); // 降序排序
+    }
+    return ids;
+}
+
+// 获取所有字体资源 ID 列表
+std::vector<std::string> AssetStore::GetAllFontAssetIds(SortFlag flag) const
+{
+    std::vector<std::string> ids;
+    for (const auto& [id, texture] : fontAssets) {
+        ids.push_back(id);
+    }
+    // 根据 flag 参数进行排序
+    if (flag == SortFlag::ASCENDING)
+    {
+        std::sort(ids.begin(), ids.end()); // 升序排序
+    }
+    else if (flag == SortFlag::DESCENDING)
+    {
+        std::sort(ids.rbegin(), ids.rend()); // 降序排序
+    }
+    return ids;
+}
+
+// 获取所有地图样式资源 ID 列表
+std::vector<std::string> AssetStore::GetAllMapStyleAssetIds(SortFlag flag) const
+{
+    std::vector<std::string> ids;
+    for (const auto& [id, texture] : mapStyleAssets) {
+        ids.push_back(id);
+    }
+    // 根据 flag 参数进行排序
+    if (flag == SortFlag::ASCENDING)
+    {
+        std::sort(ids.begin(), ids.end()); // 升序排序
+    }
+    else if (flag == SortFlag::DESCENDING)
+    {
+        std::sort(ids.rbegin(), ids.rend()); // 降序排序
+    }
+    return ids;
+}
+
+// 获取所有图片资源 ID
+std::unordered_map<std::string, SDL_Texture*>& AssetStore::GetAllImageAssets()
+{
+	return imageAssets;
+}
+
+// 获取所有音频资源 ID
+std::unordered_map<std::string, Mix_Music*>& AssetStore::GetAllAudioAssets()
+{
+    return audioAssets;
+}
+
+// 获取所有音效资源 ID
+std::unordered_map<std::string, Mix_Chunk*>& AssetStore::GetAllSoundEffectAssets()
+{
+    return soundEffectAssets;
+}
+
+// 获取所有字体资源 ID
+std::unordered_map<std::string, TTF_Font*>& AssetStore::GetAllFontAssets()
+{
+    return fontAssets;
+}
+
+// 获取所有地图样式资源 ID
+std::unordered_map<std::string, MapStyle*>& AssetStore::GetAllMapStyleAssets()
+{
+	return mapStyleAssets;
+}
+
+// 获取所有图片信息资源Map
+std::unordered_map<std::string, ImageInfo>& AssetStore::GetAllImageInfos()
+{
+	return imageInfos;
+}
+

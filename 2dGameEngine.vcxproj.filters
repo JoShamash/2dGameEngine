@@ -72,6 +72,9 @@
     <ClCompile Include="src\Components\HealthComponent.h">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="include\imgui\imgui_stdlib.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SDL3\SDL.h">
@@ -1619,6 +1622,39 @@
     <ClInclude Include="src\Systems\HealthSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\Components\TextLabelComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\RenderTextSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\HealthBarComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\RenderHealthBarSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\RenderGUISystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_stdlib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetStore\Image\ImageInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nlohmann\json_fwd.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nlohmann\json.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\EntityLifeCycleSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\EntityLifeCycleComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\glm\detail\func_common.inl">
@@ -2036,5 +2072,6 @@
       <Filter>头文件</Filter>
     </None>
     <None Include="Makefile" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

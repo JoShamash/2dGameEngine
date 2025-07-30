@@ -1,0 +1,42 @@
+{
+  "chopper-green-spritesheet.png": 
+  {
+    "width": 32,
+    "height": 32
+  },
+  "chopper-white-spritesheet.png": 
+  {
+    "width": 32,
+    "height": 32
+  },
+  "chopper.png": 
+  {
+    "width": 32,
+    "height": 32
+  },
+  "tank-tiger-right.png": 
+  {
+    "width": 32,
+    "height": 32
+  },
+  "f22.png": 
+  {
+    "width": 32,
+    "height": 32
+  },
+  "jungle.png":
+  {
+    "width": 320,
+    "height": 96
+  },
+  "radar.png":
+  {
+    "width": 64,
+    "height": 64
+  },
+  "bullet.png":
+  {
+    "width": 4,
+    "height": 4
+  }
+}

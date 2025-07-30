@@ -5,13 +5,23 @@
 #include <SDL2_image/SDL_image.h>
 #include <SDL2_mixer/SDL_mixer.h>
 #include <SDL2_ttf/SDL_ttf.h>
+#include <nlohmann/json.hpp>
 
 #include <string>
 #include <memory>
 #include <unordered_map>
 
 #include "../Logger/Logger.h"
+#include "../AssetStore/Image/ImageInfo.h"
 #include "MapStyle.h"
+
+// 升序降序标志枚举
+enum class SortFlag
+{
+    ORIGINAL = 0,   // 原始顺序
+    ASCENDING = 1,  // 升序
+    DESCENDING = 2  // 降序
+};
 
 class AssetStore
 {
@@ -100,9 +110,45 @@ public:
 	// 获取地图样式资源：返回地图样式
 	MapStyle* GetMapStyleAsset(const std::string& assetId);
 
+	// 获取所有图片资源Id列表，flag为0为原始列表，flag为1为升序列表，flag为2为降序列表
+	std::vector<std::string> GetAllImageAssetIds(SortFlag flag = SortFlag::ORIGINAL) const;
+
+    // 获取所有音频资源Id列表，flag为0为原始列表，flag为1为升序列表，flag为2为降序列表
+    std::vector<std::string> GetAllAudioAssetIds(SortFlag flag = SortFlag::ORIGINAL) const;
+
+    // 获取所有音效资源Id列表，flag为0为原始列表，flag为1为升序列表，flag为2为降序列表
+    std::vector<std::string> GetAllSoundEffectAssetIds(SortFlag flag = SortFlag::ORIGINAL) const;
+
+    // 获取所有字体资源Id列表，flag为0为原始列表，flag为1为升序列表，flag为2为降序列表
+	std::vector<std::string> GetAllFontAssetIds(SortFlag flag = SortFlag::ORIGINAL) const;
+
+	// 获取所有地图样式资源Id列表，flag为0为原始列表，flag为1为升序列表，flag为2为降序列表
+	std::vector<std::string> GetAllMapStyleAssetIds(SortFlag flag = SortFlag::ORIGINAL) const;
+
+	// 获取所有图片资源Map
+    std::unordered_map<std::string, SDL_Texture*>& GetAllImageAssets();
+
+    // 获取所有音频资源Map
+    std::unordered_map<std::string, Mix_Music*>& GetAllAudioAssets();
+
+    // 获取所有音效资源Map
+    std::unordered_map<std::string, Mix_Chunk*>& GetAllSoundEffectAssets();
+
+    // 获取所有字体资源Map
+    std::unordered_map<std::string, TTF_Font*>& GetAllFontAssets();
+    
+	// 获取所有地图样式资源Map
+	std::unordered_map<std::string, MapStyle*>& GetAllMapStyleAssets();
+
+    // 获取所有图片信息资源Map
+	std::unordered_map<std::string, ImageInfo>& GetAllImageInfos();
+
 private:
     // 存储图片资源的容器，使用资源 ID 进行索引
     std::unordered_map<std::string, SDL_Texture*> imageAssets;
+
+    // 存储图片信息的容器，使用资源 ID 进行索引
+	std::unordered_map<std::string, ImageInfo> imageInfos;
 
     // 存储音频资源的容器，使用资源 ID 进行索引
     std::unordered_map<std::string, Mix_Music*> audioAssets;
@@ -115,6 +161,9 @@ private:
 
 	// 存储地图样式的容器，使用资源 ID 进行索引
 	std::unordered_map<std::string, MapStyle*> mapStyleAssets;
+
+private:
+        nlohmann::json imageJson;
 };
 
 #endif // ASSETSTORE_H

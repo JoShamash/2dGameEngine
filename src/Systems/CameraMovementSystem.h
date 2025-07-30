@@ -28,8 +28,8 @@ public:
 			const auto& position = transformComponent.position;
 
 			// 更新摄像机位置，使其跟随实体，摄像机位置为实体位置减去摄像机视口宽高的一半
-			camera.x = position.x - (camera.w / 2);
-			camera.y = position.y - (camera.h / 2);
+			camera.x = position.x - (camera.w / 2.0);
+			camera.y = position.y - (camera.h / 2.0);
 
 			// 限制摄像机在地图范围内
 			if (camera.x < 0) 

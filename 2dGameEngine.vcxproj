@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="src\AssetStore\AssetStore.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
     <ClCompile Include="include\glm\glm.cppm" />
@@ -40,6 +41,9 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\imgui\imgui_stdlib.h" />
+    <ClInclude Include="include\nlohmann\json.hpp" />
+    <ClInclude Include="include\nlohmann\json_fwd.hpp" />
     <ClInclude Include="src\AssetStore\AssetStore.h" />
     <ClInclude Include="include\glm\common.hpp" />
     <ClInclude Include="include\glm\detail\compute_common.hpp" />
@@ -528,13 +532,17 @@
     <ClInclude Include="include\sol\config.hpp" />
     <ClInclude Include="include\sol\forward.hpp" />
     <ClInclude Include="include\sol\sol.hpp" />
+    <ClInclude Include="src\AssetStore\Image\ImageInfo.h" />
     <ClInclude Include="src\AssetStore\MapStyle.h" />
     <ClInclude Include="src\Camera\Camera.h" />
     <ClInclude Include="src\Components\CameraFollowComponent.h" />
     <ClInclude Include="src\Components\CampComponent.h" />
+    <ClInclude Include="src\Components\EntityLifeCycleComponent.h" />
+    <ClInclude Include="src\Components\HealthBarComponent.h" />
     <ClInclude Include="src\Components\ProjectileComponent.h" />
     <ClInclude Include="src\Components\ProjectileEmitterComponent.h" />
     <ClInclude Include="src\Components\SpriteComponent.h" />
+    <ClInclude Include="src\Components\TextLabelComponent.h" />
     <ClInclude Include="src\Components\TransformComponent.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\EventBus\Event.h" />
@@ -547,6 +555,7 @@
     <ClInclude Include="src\Systems\CameraMovementSystem.h" />
     <ClInclude Include="src\Systems\CollisionSystem.h" />
     <ClInclude Include="src\Systems\DamageSystem.h" />
+    <ClInclude Include="src\Systems\EntityLifeCycleSystem.h" />
     <ClInclude Include="src\Systems\HealthSystem.h" />
     <ClInclude Include="src\Systems\KeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\MovementSystem.h" />
@@ -554,6 +563,9 @@
     <ClInclude Include="src\Systems\ProjectileLifeCycleSystem.h" />
     <ClInclude Include="src\Systems\RenderColliderSystem.h" />
     <ClInclude Include="src\Systems\RenderEntitySystem.h" />
+    <ClInclude Include="src\Systems\RenderGUISystem.h" />
+    <ClInclude Include="src\Systems\RenderHealthBarSystem.h" />
+    <ClInclude Include="src\Systems\RenderTextSystem.h" />
     <ClInclude Include="src\Time\Timer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -696,6 +708,7 @@
     <None Include="include\glm\gtx\vector_query.inl" />
     <None Include="include\glm\gtx\wrap.inl" />
     <None Include="Makefile" />
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -820,5 +833,16 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\pixman_static.0.32.4.6\build\native\pixman_static.targets" Condition="Exists('packages\pixman_static.0.32.4.6\build\native\pixman_static.targets')" />
+    <Import Project="packages\zlib_static.1.2.11.1\build\native\zlib_static.targets" Condition="Exists('packages\zlib_static.1.2.11.1\build\native\zlib_static.targets')" />
+    <Import Project="packages\libpng_static.1.4.1.2\build\native\libpng_static.targets" Condition="Exists('packages\libpng_static.1.4.1.2\build\native\libpng_static.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\pixman_static.0.32.4.6\build\native\pixman_static.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\pixman_static.0.32.4.6\build\native\pixman_static.targets'))" />
+    <Error Condition="!Exists('packages\zlib_static.1.2.11.1\build\native\zlib_static.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\zlib_static.1.2.11.1\build\native\zlib_static.targets'))" />
+    <Error Condition="!Exists('packages\libpng_static.1.4.1.2\build\native\libpng_static.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\libpng_static.1.4.1.2\build\native\libpng_static.targets'))" />
+  </Target>
 </Project>

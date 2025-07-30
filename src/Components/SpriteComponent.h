@@ -43,6 +43,53 @@ enum class RenderLayer : Uint8
     Count                 // 层数
 };
 
+// 定义渲染层枚举对应的字符串映射·中文
+inline const char* RenderLayerText(const RenderLayer& layer)
+{
+    switch (layer)
+    {
+        case RenderLayer::BackgroundFar: 
+            return U8_TO_CHARPTR("最远背景");
+        case RenderLayer::BackgroundNear: 
+			return U8_TO_CHARPTR("近背景");
+        case RenderLayer::Terrain: 
+            return U8_TO_CHARPTR("地形");
+        case RenderLayer::StaticGeometry: 
+            return U8_TO_CHARPTR("静态几何");
+        case RenderLayer::Decals: 
+            return U8_TO_CHARPTR("贴花");
+        case RenderLayer::DynamicGeometry: 
+            return U8_TO_CHARPTR("动态几何");
+        case RenderLayer::Characters: 
+            return U8_TO_CHARPTR("角色与NPC");
+        case RenderLayer::Weapons: 
+            return U8_TO_CHARPTR("武器与工具");
+        case RenderLayer::Projectiles: 
+            return U8_TO_CHARPTR("子弹与抛射物");
+        case RenderLayer::EffectsUnder: 
+            return U8_TO_CHARPTR("角色下方特效");
+        case RenderLayer::EffectsOver: 
+            return U8_TO_CHARPTR("角色上方特效");
+        case RenderLayer::Particles: 
+            return U8_TO_CHARPTR("通用粒子系统");
+        case RenderLayer::UIBackground: 
+            return U8_TO_CHARPTR("UI背景板");
+        case RenderLayer::UI: 
+            return U8_TO_CHARPTR("主要UI元素");
+        case RenderLayer::UIForeground: 
+            return U8_TO_CHARPTR("UI前景叠加");
+        case RenderLayer::Overlay: 
+            return U8_TO_CHARPTR("全屏覆盖");
+        case RenderLayer::PostProcessing: 
+            return U8_TO_CHARPTR("后期处理");
+        case RenderLayer::Debug: 
+            return U8_TO_CHARPTR("调试叠加");
+        default:
+			return U8_TO_CHARPTR("未知层级");
+    }
+}
+
+
 // 定义方向贴图枚举，不同方向选择不同贴图，贴图格式为从左到右是帧动画，从上到下是方向贴图（↑→↓←）
 enum class DirectionTexture : Uint8
 {

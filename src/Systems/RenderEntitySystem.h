@@ -1,14 +1,13 @@
 #ifndef RENDERENTITYSYSTEM_H
 #define RENDERENTITYSYSTEM_H
 
-#include <SDL2_image/SDL_image.h>
-#include <map>
-
 #include "../ECS/ECS.h"
 #include "../AssetStore/AssetStore.h"
 #include "../Camera/Camera.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
+
+#include <map>
 
 // 渲染实体系统类，定义一系列逻辑接口，负责渲染实体的图像到屏幕上
 class RenderEntitySystem : public System
@@ -56,7 +55,6 @@ public:
 				static_cast<int>(spriteComponent.size.x * transformComponent.scale.x),
 				static_cast<int>(spriteComponent.size.y * transformComponent.scale.y)
 			};
-
 
 			if (layer < RenderLayer::UIBackground)
 			{
