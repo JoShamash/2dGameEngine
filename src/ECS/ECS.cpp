@@ -227,6 +227,11 @@ bool Registry::HasGroup(const std::string& input) const
 
 void Registry::EntityAddTag(const Entity& entity, const std::string& input)
 {
+	if (input.empty())
+	{
+		return;
+	}
+
 	auto tag = to_lower(input);
 	auto id = entity.GetId();
 	if (tagEntityMap.find(tag) != tagEntityMap.end())
@@ -304,6 +309,11 @@ const Entity& Registry::GetEntityByTag(const std::string& input) const
 
 void Registry::EntityAddGroup(const Entity& entity, const std::string& input)
 {
+	if (input.empty())
+	{
+		return;
+	}
+
 	auto group = to_lower(input);
 	auto id = entity.GetId();
 	if (entityGroupMap.find(id) != entityGroupMap.end())
@@ -392,4 +402,9 @@ std::string Registry::to_upper(std::string str)
 		return std::toupper(c);
 		});
 	return str;
+}
+
+bool Registry::is_same_word(const std::string& str1, const std::string& str2)
+{
+	return to_lower(str1) == to_lower(str2);
 }

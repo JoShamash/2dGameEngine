@@ -371,12 +371,15 @@ public:
 	// 获取引擎某一系统
 	template <class TSystem> TSystem& GetSystem() const;
 
-private:
+public:
 	// string转小写
 	static std::string to_lower(std::string str);
 
 	// string转大写
 	static std::string to_upper(std::string str);
+
+	// string判断单词相同
+	static bool is_same_word(const std::string& str1, const std::string& str2);
 
 private:  
 	glm::uint64 numEntities = 0;		// 当前实体数量，同时也代表下一个实体ID

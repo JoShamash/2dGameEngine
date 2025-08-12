@@ -36,6 +36,7 @@
     <ClCompile Include="src\Components\KeyboardControlComponent.h" />
     <ClCompile Include="src\Components\RigidBodyComponent.h" />
     <ClCompile Include="src\ECS\ECS.cpp" />
+    <ClCompile Include="src\LevelLoader\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\GameEngine\GameEngine.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -549,6 +550,7 @@
     <ClInclude Include="src\EventBus\EventBus.h" />
     <ClInclude Include="src\Events\CollisionEvent.h" />
     <ClInclude Include="src\Events\KeyPressedEvent.h" />
+    <ClInclude Include="src\LevelLoader\LevelLoader.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\GameEngine\GameEngine.h" />
     <ClInclude Include="src\Systems\AnimationSystem.h" />

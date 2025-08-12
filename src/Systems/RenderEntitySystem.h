@@ -6,6 +6,8 @@
 #include "../Camera/Camera.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../Components/RigidBodyComponent.h"
+#include "../Components/AnimationComponent.h"
 
 #include <map>
 
@@ -33,7 +35,7 @@ public:
 	{
 		std::multimap<RenderLayer, Entity> entities; // 存储渲染系统中的实体，按渲染层分类
 
-		SDL_Rect window = {0, 0, camera.w, camera.h};
+		SDL_Rect cameraView = {0, 0, camera.w, camera.h};
 
 		for (const auto& entity : GetEntities())
 		{
@@ -46,9 +48,35 @@ public:
 			auto& transformComponent = entity.GetComponent<TransformComponent>();
 			auto& spriteComponent = entity.GetComponent<SpriteComponent>();
 			auto& layer = spriteComponent.layer;
-			
 			SDL_Rect srcRect = spriteComponent.srcRect;
 
+			if (entity.HasComponent<RigidBodyComponent>() && entity.HasComponent<AnimationComponent>())
+			{
+				const auto& size = spriteComponent.size;
+				// 根据运动方向设置源矩形的y坐标
+				
+				const auto& rigidBodyComponent = entity.GetComponent<RigidBodyComponent>();
+				const auto& velocity = rigidBodyComponent.velocity;
+				
+				if(fabs(velocity.x) > fabs(velocity.y) && velocity.x > 0)
+				{
+					srcRect.y = size.y * static_cast<int>(DirectionTexture::Right);
+				}
+				else if(fabs(velocity.x) > fabs(velocity.y) && velocity.x < 0)
+				{
+					srcRect.y = size.y * static_cast<int>(DirectionTexture::Left);
+				}
+				else if(fabs(velocity.x) < fabs(velocity.y) && velocity.y > 0)
+				{
+					srcRect.y = size.y * static_cast<int>(DirectionTexture::Down);
+				}
+				else if(fabs(velocity.x) < fabs(velocity.y) && velocity.y < 0)
+				{
+					srcRect.y = size.y * static_cast<int>(DirectionTexture::Up);
+				}
+				
+			}
+			
 			SDL_Rect dstRect = {
 				static_cast<int>(transformComponent.position.x),
 				static_cast<int>(transformComponent.position.y),
@@ -62,7 +90,8 @@ public:
 				dstRect.y -= camera.y;
 			}
 
-			if (!SDL_HasIntersection(&dstRect, &window))
+			// 检查目标绘制矩形是否在相机视图内部
+			if (!SDL_HasIntersection(&dstRect, &cameraView))
 			{
 				continue;
 			}
