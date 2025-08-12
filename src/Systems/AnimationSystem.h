@@ -33,10 +33,29 @@ public:
 			auto& animationComponent = entity.GetComponent<AnimationComponent>();
 
 			const auto& startTime = animationComponent.startTime;
+			const auto& isLooping = animationComponent.isLooping;
 			const auto& frameSpeed = animationComponent.frameSpeed;
 			const auto& numFrames = animationComponent.numFrames;
 			auto& currentFrame = animationComponent.currentFrame;
-			currentFrame = ((Timer::time.gameTime - startTime) * frameSpeed / 1000) % numFrames;
+
+			// 当前帧索引大于等于总帧数时，等价于不循环播放，跳过后续计算更新帧索引
+			if (currentFrame >= numFrames)
+			{
+				continue;
+			}
+			
+			// 计算当前时间与开始时间的差值
+			auto elapsedTime = Timer::time.gameTime - startTime;
+			// 计算当前帧索引
+			currentFrame = elapsedTime / 1000.0 * frameSpeed;
+			if(numFrames == 0)
+			{
+				currentFrame = 0; // 防止mod零
+			}
+			else if(isLooping)
+			{
+				currentFrame %= numFrames;
+			}
 
 			const auto& size = spriteComponent.size;
 			auto& srcRect = spriteComponent.srcRect;

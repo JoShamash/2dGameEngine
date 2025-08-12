@@ -18,6 +18,7 @@ public:
 	{
 		RequireComponent<TransformComponent>();
 		RequireComponent<RigidBodyComponent>();
+		RequireComponent<EntityLifeCycleComponent>();
 
 		std::string message = U8_TO_CHARPTR("ÃÌº”œµÕ≥£∫") + NAME;
 		Logger::Instance().Log(LogLevel::INFO, message);

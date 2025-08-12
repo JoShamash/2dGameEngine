@@ -15,7 +15,7 @@ struct ProjectileEmitterComponent
 	inline const static std::string NAME = std::string("ProjectileEmitterComponent") + U8_TO_CHARPTR("发射器组件"); // 组件名称
 
 
-	bool   isEmit;					// 是否开启发射功能
+	bool isEmit;					// 是否开启发射功能
 	int repeatFrequency;			// 发射频率（单位：ms）
 	int projectileDuration;			// 发射物持续时间（单位：ms）
 	double hitDamage;				// 发射物造成的伤害

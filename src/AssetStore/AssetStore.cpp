@@ -226,7 +226,18 @@ void AssetStore::AddImageAsset(SDL_Renderer* renderer, const std::string& assetI
 
 	// 添加图片信息到容器中
 	std::string fileName = path.substr(path.find_last_of("/\\") + 1); // 获取文件名
-    imageInfos.emplace(assetId, ImageInfo{ imageJson[fileName]["width"], imageJson[fileName]["height"]});
+    
+    int width = 0, height = 0;
+    if (imageJson[fileName].contains("width") && imageJson[fileName]["width"].is_number_integer()) 
+    {
+		width = imageJson[fileName]["width"].get<int>();
+    }
+	if (imageJson[fileName].contains("height") && imageJson[fileName]["height"].is_number_integer()) 
+    {
+        height = imageJson[fileName]["height"].get<int>();
+	}
+
+    imageInfos.emplace(assetId, ImageInfo{width, height});
     
 	std::string message = U8_TO_CHARPTR("加载图片资源：资产编号：") + assetId + U8_TO_CHARPTR(" 资产路径：") + path;
     Logger::Instance().Log(LogLevel::INFO, message);

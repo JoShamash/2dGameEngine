@@ -18,6 +18,7 @@ constexpr double IM_PI = 3.14159265358979323846;
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_sdlrenderer2.h>
 #include "../AssetStore/AssetStore.h"
+
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
@@ -116,7 +117,7 @@ public:
 				{
 					ImGui::TableSetupColumn("attribute", ImGuiTableColumnFlags_WidthFixed);		// 第一列固定宽度
 					ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthStretch);		// 第二列自动填充
-					
+
 					auto inputFlag = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll;
 
 					// 显示当前阵营
@@ -125,7 +126,7 @@ public:
 					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("阵营选择"));
 					ImGui::TableSetColumnIndex(1);
-					if(ImGui::BeginCombo(U8_TO_CHARPTR("##阵营选择_BeginCombo"), CampText(camp)))
+					if (ImGui::BeginCombo(U8_TO_CHARPTR("##阵营选择_BeginCombo"), CampText(camp)))
 					{
 						for (int i = 0; i < static_cast<int>(Camp::Count); ++i)
 						{
@@ -209,9 +210,9 @@ public:
 				{
 					ImGui::TableSetupColumn("attribute", ImGuiTableColumnFlags_WidthFixed);		// 第一列固定宽度
 					ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthStretch);		// 第二列自动填充
-					
+
 					auto inputFlag = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll;
-					
+
 					// 显示当前血条/文本初始颜色
 					static ImColor tempFillColor = { fillColor.r, fillColor.g, fillColor.b, fillColor.a };
 					ImGui::TableNextRow();
@@ -240,7 +241,7 @@ public:
 					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("字体样式资源"));
 					ImGui::TableSetColumnIndex(1);
-					if(ImGui::BeginCombo(U8_TO_CHARPTR("##字体样式资源_BeginCombo"), assetIdSelected.c_str(), ImGuiComboFlags_HeightRegular))
+					if (ImGui::BeginCombo(U8_TO_CHARPTR("##字体样式资源_BeginCombo"), assetIdSelected.c_str(), ImGuiComboFlags_HeightRegular))
 					{
 						for (int i = 0; i < fontAssets.size(); ++i)
 						{
@@ -261,11 +262,11 @@ public:
 								// 获取选中的字体样式
 								auto& hoveredFont = fontAssets.at(fontAssetIds[i]);
 
-								if(hoveredFont)
+								if (hoveredFont)
 								{
 									auto text = U8_TO_CHARPTR("这是字体样式预览 This is font preview");
 
-									if(fontTextureMap.find(fontAssetIds[i]) == fontTextureMap.end())
+									if (fontTextureMap.find(fontAssetIds[i]) == fontTextureMap.end())
 									{
 										// 如果字体纹理不存在，则创建
 										SDL_Surface* surface = TTF_RenderUTF8_Blended(hoveredFont, text, fillColor);
@@ -402,12 +403,12 @@ public:
 						// 显示图片（RGBA纹理）设置位置
 						ImGui::SetCursorScreenPos(textPos);
 						ImGui::Image((ImTextureID)hpTexture, textSize);
-					}			
-					
+					}
+
 					ImGui::EndTable();
 				}
 				ImGui::PopStyleVar();
-				
+
 			}
 
 			// 设置 Transform变换组件属性
@@ -431,37 +432,37 @@ public:
 
 					// 显示当前X轴位置
 					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); 
+					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("X轴位置"));
-					ImGui::TableSetColumnIndex(1); 
+					ImGui::TableSetColumnIndex(1);
 					ImGui::InputDouble(U8_TO_CHARPTR("##X轴位置_InputDouble"), &pos.x, 1, 10, "%.2f", inputFlag);
 
 					// 显示当前Y轴位置
 					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); 
+					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("Y轴位置"));
-					ImGui::TableSetColumnIndex(1); 
+					ImGui::TableSetColumnIndex(1);
 					ImGui::InputDouble(U8_TO_CHARPTR("##Y轴位置_InputDouble"), &pos.y, 1, 10, "%.2f", inputFlag);
 
 					// 显示当前旋转角度
 					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); 
+					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("旋转角度"));
-					ImGui::TableSetColumnIndex(1); 
+					ImGui::TableSetColumnIndex(1);
 					ImGui::InputDouble(U8_TO_CHARPTR("##旋转角度_InputDouble"), &angle, 1, 10, "%.2f", inputFlag);
 
 					// 显示当前X轴缩放
 					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); 
+					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("X轴缩放"));
-					ImGui::TableSetColumnIndex(1); 
+					ImGui::TableSetColumnIndex(1);
 					ImGui::InputDouble(U8_TO_CHARPTR("##X轴缩放_InputDouble"), &scale.x, 0.1, 1, "%.2f", inputFlag);
 
 					// 显示当前Y轴缩放
 					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); 
+					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("Y轴缩放"));
-					ImGui::TableSetColumnIndex(1); 
+					ImGui::TableSetColumnIndex(1);
 					ImGui::InputDouble(U8_TO_CHARPTR("##Y轴缩放_InputDouble"), &scale.y, 0.1, 1, "%.2f", inputFlag);
 
 					ImGui::EndTable();
@@ -499,19 +500,19 @@ public:
 
 					// 显示当前速率
 					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); 
+					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("速率"));
-					ImGui::TableSetColumnIndex(1); 
+					ImGui::TableSetColumnIndex(1);
 					ImGui::InputDouble(U8_TO_CHARPTR("##速率_InputDouble"), &speed, 0.1, 1, "%.2f", inputFlag);
 
 					// 显示当前速度方向
 					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); 
+					ImGui::TableSetColumnIndex(0);
 					ImGui::Text(U8_TO_CHARPTR("速度方向"));
-					ImGui::TableSetColumnIndex(1); 
+					ImGui::TableSetColumnIndex(1);
 					if (SliderAngleDeg(U8_TO_CHARPTR("##速度方向_SliderAngleDeg"), &angle, 0.0, 360.0, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
 						// 将角度转换为弧度
-						double rad = glm::radians(angle-90);
+						double rad = glm::radians(angle - 90);
 						velocity.x = std::cos(rad);
 						velocity.y = std::sin(rad);
 					}
@@ -544,7 +545,7 @@ public:
 				{
 					ImGui::TableSetupColumn("attribute", ImGuiTableColumnFlags_WidthFixed);		// 第一列固定宽度
 					ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthStretch);		// 第二列自动填充
-					
+
 					// 显示当前贴图资源名称
 					static int imageAssetIdsSelectIdx = 0;
 					static std::string assetIdSelected = U8_TO_CHARPTR("请选择贴图资源");
@@ -554,7 +555,7 @@ public:
 					ImGui::TableSetColumnIndex(1);
 					if (ImGui::BeginCombo(U8_TO_CHARPTR("##贴图资源名称_BeginCombo"), assetIdSelected.c_str(), ImGuiComboFlags_HeightRegular))
 					{
-						for (int i = 0; i < imageAssetIds.size(); ++i) 
+						for (int i = 0; i < imageAssetIds.size(); ++i)
 						{
 							bool is_selected = (imageAssetIdsSelectIdx == i);
 							if (ImGui::Selectable(imageAssetIds[i].c_str(), is_selected))
@@ -608,10 +609,10 @@ public:
 						}
 						ImGui::EndCombo();
 					}
-					
+
 					// 显示当前精灵宽度和长度
 					ImageInfo imageInfo;
-					if(imageInfos.find(assetId) != imageInfos.end())
+					if (imageInfos.find(assetId) != imageInfos.end())
 					{
 						imageInfo = imageInfos.at(assetId);
 					}
@@ -699,18 +700,18 @@ public:
 
 					ImGui::EndTable();
 
-					if(size.x < 0.0)
+					if (size.x < 0.0)
 					{
 						size.x = tempSize.x;	// 限制碰撞盒宽度
 					}
-					if(size.y < 0.0)
+					if (size.y < 0.0)
 					{
 						size.y = tempSize.y;	// 限制碰撞盒高度
 					}
 				}
 				ImGui::PopStyleVar();
 			}
-			
+
 			// 设置 ProjectileEmitter发射器组件属性
 			if (ImGui::CollapsingHeader(U8_TO_CHARPTR("发射器组件属性##ProjectileEmitterComponent")))
 			{
@@ -768,7 +769,7 @@ public:
 					ImGui::Text(U8_TO_CHARPTR("发射物速度"));
 					ImGui::TableSetColumnIndex(1);
 					ImGui::InputDouble(U8_TO_CHARPTR("##发射物速度_InputDouble"), &speed, 1, 10, "%.2f", inputFlag);
-					
+
 					ImGui::EndTable();
 
 					if (repeatFrequency < 1)
@@ -796,15 +797,12 @@ public:
 				CreateEntity(registry);
 			}
 
-
 			if (ImGui::Button(U8_TO_CHARPTR("创建多个敌人")))
 			{
 				// 启动多线程执行
-				std::thread t([this, &registry]() {SpawnEnemiesWithDelay(registry);});
+				std::thread t([this, &registry]() {SpawnEnemiesWithDelay(registry); });
 				t.detach(); // 不阻塞主线程，让其独立执行
 			}
-
-
 		}
 		ImGui::End();
 
@@ -820,14 +818,15 @@ public:
 		ImGuiWindowFlags textFlags = ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
 
 		ImGui::Begin("Coordinates", nullptr, textFlags);
-		auto posX = ImGui::GetIO().MousePos.x + camera.x;
-		auto posY = ImGui::GetIO().MousePos.y + camera.y;
-		ImGui::Text(U8_TO_CHARPTR("当前坐标：(%.2f | %.2f)"), posX, posY);
+		ImVec2 mousePos = { ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y };
+		if (mousePos.x < 0 || mousePos.y < 0)
+		{
+			mousePos = { 0.0f, 0.0f };
+		}
+		ImGui::Text(U8_TO_CHARPTR("当前坐标：(%.2f | %.2f)"), mousePos.x, mousePos.y);
 		ImGui::End();
 
 		ImGui::PopStyleVar(3);
-		
-
 
 		ImGui::ShowDemoWindow();   
 		ImGui::Render();
@@ -845,7 +844,7 @@ private:
 			rigidBodyComponent.velocity = { enemyVelocityX, enemyVelocityY };
 			CreateEntity(registry);
 
-			SDL_Delay(500);
+			SDL_Delay(1500);
 		}
 	}
 
@@ -936,17 +935,18 @@ private:
 
 	void CreateEntity(std::unique_ptr<Registry>& registry)
 	{
-		Entity enemy = registry->CreateEntity();
-		enemy.AddGroup("enemy");
+		Entity entity = registry->CreateEntity();
+		entity.AddTag(tagName);					// 添加标签
+		entity.AddGroup(groupName);				// 添加组
 
-		enemy.AddComponent<TransformComponent>(transformComponent);
-		enemy.AddComponent<RigidBodyComponent>(rigidBodyComponent);
-		enemy.AddComponent<SpriteComponent>(spriteComponent);
-		enemy.AddComponent<BoxColliderComponent>(boxColliderComponent);
-		enemy.AddComponent<ProjectileEmitterComponent>(projectileEmitterComponent);
-		enemy.AddComponent<CampComponent>(campComponent);
-		enemy.AddComponent<HealthComponent>(healthComponent);
-		enemy.AddComponent<HealthBarComponent>(healthBarComponent);
+		entity.AddComponent<TransformComponent>(transformComponent);					// 添加变换组件
+		entity.AddComponent<RigidBodyComponent>(rigidBodyComponent);					// 添加刚体组件
+		entity.AddComponent<SpriteComponent>(spriteComponent);							// 添加精灵组件
+		entity.AddComponent<BoxColliderComponent>(boxColliderComponent);				// 添加碰撞盒组件
+		entity.AddComponent<ProjectileEmitterComponent>(projectileEmitterComponent);	// 添加子弹发射组件
+		entity.AddComponent<CampComponent>(campComponent);								// 添加阵营组件
+		entity.AddComponent<HealthComponent>(healthComponent);							// 添加生命值组件
+		entity.AddComponent<HealthBarComponent>(healthBarComponent);					// 添加生命条组件
 	}
 
 private:

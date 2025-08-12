@@ -13,6 +13,9 @@ public:
 	HealthSystem()
 	{
 		RequireComponent<HealthComponent>();
+
+		std::string message = U8_TO_CHARPTR("ÃÌº”œµÕ≥£∫") + NAME;
+		Logger::Instance().Log(LogLevel::INFO, message);
 	}
 
 	void Update()

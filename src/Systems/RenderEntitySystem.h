@@ -6,8 +6,11 @@
 #include "../Camera/Camera.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../Components/RigidBodyComponent.h"
+#include "../Components/AnimationComponent.h"
 
 #include <map>
+#include <ranges>
 
 // 渲染实体系统类，定义一系列逻辑接口，负责渲染实体的图像到屏幕上
 class RenderEntitySystem : public System
@@ -31,53 +34,86 @@ public:
 	*/
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore, const Camera& camera)
 	{
-		std::multimap<RenderLayer, Entity> entities; // 存储渲染系统中的实体，按渲染层分类
+		std::unordered_multimap<RenderLayer, Entity> entities; // 存储渲染系统中的实体，按渲染层分类
 
-		SDL_Rect window = {0, 0, camera.w, camera.h};
+		SDL_Rect cameraView = {0, 0, camera.w, camera.h};
 
 		for (const auto& entity : GetEntities())
 		{
 			auto& spriteComponent = entity.GetComponent<SpriteComponent>();
-			entities.insert({spriteComponent.layer, entity});
+			entities.emplace(spriteComponent.layer, entity);
 		}
 
-		for (const auto& [layer, entity] : entities)
+		for (int renderLayer = 0; renderLayer < static_cast<int>(RenderLayer::Count); renderLayer++)
 		{
-			auto& transformComponent = entity.GetComponent<TransformComponent>();
-			auto& spriteComponent = entity.GetComponent<SpriteComponent>();
-			auto& layer = spriteComponent.layer;
-			
-			SDL_Rect srcRect = spriteComponent.srcRect;
+			auto [first, last] = entities.equal_range(static_cast<RenderLayer>(renderLayer));
+			auto range = std::ranges::subrange(first, last);
 
-			SDL_Rect dstRect = {
-				static_cast<int>(transformComponent.position.x),
-				static_cast<int>(transformComponent.position.y),
-				static_cast<int>(spriteComponent.size.x * transformComponent.scale.x),
-				static_cast<int>(spriteComponent.size.y * transformComponent.scale.y)
-			};
-
-			if (layer < RenderLayer::UIBackground)
+			for (const auto& [layer, entity] : range)
 			{
-				dstRect.x -= camera.x;
-				dstRect.y -= camera.y;
-			}
+				auto& transformComponent = entity.GetComponent<TransformComponent>();
+				auto& spriteComponent = entity.GetComponent<SpriteComponent>();
+				auto& layer = spriteComponent.layer;
+				SDL_Rect srcRect = spriteComponent.srcRect;
 
-			if (!SDL_HasIntersection(&dstRect, &window))
-			{
-				continue;
-			}
+				if (entity.HasComponent<RigidBodyComponent>() && entity.HasComponent<AnimationComponent>())
+				{
+					const auto& size = spriteComponent.size;
+					// 根据运动方向设置源矩形的y坐标
 
-			SDL_RenderCopyEx(
-				renderer, 
-				assetStore->GetImageAsset(spriteComponent.assetId), 
-				&srcRect, 
-				&dstRect, 
-				transformComponent.rotation,
-				NULL,
-				SDL_FLIP_NONE
-			);
-			//std::string message = U8_TO_CHARPTR("渲染，实体(id=") + std::to_string(entity.GetId()) + ")";
-			//Logger::Instance().Log(LogLevel::INFO, RenderEntitySystem::NAME + message);
+					const auto& rigidBodyComponent = entity.GetComponent<RigidBodyComponent>();
+					const auto& velocity = rigidBodyComponent.velocity;
+
+					if (spriteComponent.isDirSheet)
+					{
+						if (fabs(velocity.x) >= fabs(velocity.y) && velocity.x > 0)
+						{
+							srcRect.y = size.y * static_cast<int>(DirectionTexture::Right);
+						}
+						else if (fabs(velocity.x) >= fabs(velocity.y) && velocity.x < 0)
+						{
+							srcRect.y = size.y * static_cast<int>(DirectionTexture::Left);
+						}
+						else if (fabs(velocity.x) < fabs(velocity.y) && velocity.y > 0)
+						{
+							srcRect.y = size.y * static_cast<int>(DirectionTexture::Down);
+						}
+						else if (fabs(velocity.x) < fabs(velocity.y) && velocity.y < 0)
+						{
+							srcRect.y = size.y * static_cast<int>(DirectionTexture::Up);
+						}
+					}
+				}
+
+				SDL_Rect dstRect = {
+					static_cast<int>(transformComponent.position.x),
+					static_cast<int>(transformComponent.position.y),
+					static_cast<int>(spriteComponent.size.x * transformComponent.scale.x),
+					static_cast<int>(spriteComponent.size.y * transformComponent.scale.y)
+				};
+
+				if (layer < RenderLayer::UIBackground)
+				{
+					dstRect.x -= camera.x;
+					dstRect.y -= camera.y;
+				}
+
+				// 检查目标绘制矩形是否在相机视图内部
+				if (!SDL_HasIntersection(&dstRect, &cameraView))
+				{
+					continue;
+				}
+
+				SDL_RenderCopyEx(
+					renderer,
+					assetStore->GetImageAsset(spriteComponent.assetId),
+					&srcRect,
+					&dstRect,
+					transformComponent.rotation,
+					NULL,
+					SDL_FLIP_NONE
+				);
+			}
 		}
 	}
 };

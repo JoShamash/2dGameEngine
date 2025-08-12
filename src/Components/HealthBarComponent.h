@@ -20,7 +20,7 @@ struct HealthBarComponent {
 	SDL_Color fillColor;		// 填充颜色&文本颜色，默认为白色
 	SDL_Color backgroundColor;	// 背景颜色，默认为灰色半透明
 
-	HealthBarComponent(std::string assetId = "", glm::i64vec2 size = {50, 5}, SDL_Color borderColor = {255, 255, 255, 255}, SDL_Color fillColor = {255, 255, 255, 255}, SDL_Color backgroundColor = {128, 128, 128, 128})
+	HealthBarComponent(const std::string& assetId = "", glm::i64vec2 size = {50, 5}, SDL_Color borderColor = {255, 255, 255, 255}, SDL_Color fillColor = {255, 255, 255, 255}, SDL_Color backgroundColor = {128, 128, 128, 128})
 		: assetId(assetId), size(size), borderColor(borderColor), fillColor(fillColor), backgroundColor(backgroundColor) { }
 };
 

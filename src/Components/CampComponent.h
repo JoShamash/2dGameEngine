@@ -12,6 +12,7 @@ enum class Camp : Uint8
 	Friend = 0,		// 友方
 	Enemy,			// 敌方
 	Neutral,		// 中立方
+	None,			// 无阵营，通常为静态物
 
 	Count
 };
@@ -27,8 +28,36 @@ inline const char* CampText(const Camp& camp)
 			return U8_TO_CHARPTR("敌方");
 		case Camp::Neutral: 
 			return U8_TO_CHARPTR("中立方");
+		case Camp::None:
+			return U8_TO_CHARPTR("无阵营");
 		default:
 			return U8_TO_CHARPTR("未知阵营");
+	}
+}
+
+inline Camp CampFromString(const std::string& str)
+{
+	if (Registry::is_same_word(str, "Friend") || str == U8_TO_CHARPTR("友方"))
+	{
+		return Camp::Friend;
+	}
+	else if (Registry::is_same_word(str, "Enemy") || str == U8_TO_CHARPTR("敌方"))
+	{
+		return Camp::Enemy;
+	}
+	else if (Registry::is_same_word(str, "Neutral") || str == U8_TO_CHARPTR("中立方"))
+	{
+		return Camp::Neutral;
+	}
+	else if (Registry::is_same_word(str, "None") || str == U8_TO_CHARPTR("无阵营"))
+	{
+		return Camp::None;
+	}
+	else
+	{
+		std::string message = U8_TO_CHARPTR("未知的阵营字符串：") + str + U8_TO_CHARPTR("，默认设置为友方");
+		Logger::Instance().Log(LogLevel::WARN, message);
+		return Camp::Friend;
 	}
 }
 
@@ -48,6 +77,9 @@ struct CampComponent {
 	*/
 	CampComponent(Camp camp = Camp::Friend)
 		: camp(camp) { }
+
+	CampComponent(const std::string& campStr)
+		: camp(CampFromString(campStr)) { }
 };
 
 #endif // !CAMPCOMPONENT_H

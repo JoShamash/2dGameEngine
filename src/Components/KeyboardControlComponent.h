@@ -13,12 +13,13 @@
 struct KeyboardControlComponent {
 	inline const static std::string NAME = std::string("KeyboardControlComponent") + U8_TO_CHARPTR("键盘控制组件"); // 组件名称
 
-
 	glm::f64vec2 upVelocity = {0, -1};		// 向上↑移动的速度方向
 	glm::f64vec2 rightVelocity = {1, 0};	// 向右→移动的速度方向
 	glm::f64vec2 downVelocity = {0, 1};		// 向下↓移动的速度方向
 	glm::f64vec2 leftVelocity = {-1, 0};	// 向左←移动的速度方向
+
 	bool isFire = false;					// 空格控制是否开火
+	bool isMove = false;					// 是否移动
 
 
 	/**

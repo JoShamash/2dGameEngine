@@ -2,6 +2,7 @@
 #define ECS_H
 
 #include <glm/glm.hpp>
+#include <string>
 #include <bitset>
 #include <vector>
 #include <unordered_map>
@@ -29,7 +30,7 @@ class Registry; // 前向声明注册表类
 class Entity 
 {
 public:
-	Entity(glm::uint64 id = -1) : id(id){};
+	Entity(glm::uint64 id) : id(id){};
 	Entity(const Entity& entity) = default;
 	~Entity() = default;
 
@@ -70,7 +71,7 @@ public:
 	bool HasTag(const std::string& input) const;
 
 	// 通过实体获取tag标签
-	const std::string& GetTag() const;
+	const std::string GetTag() const;
 
 	// 实体添加group组名
 	void AddGroup(const std::string& input) const;
@@ -85,7 +86,7 @@ public:
 	bool HasGroup(const std::string& input) const;
 
 	// 通过实体获取group组名
-	const std::string& GetGroup() const;
+	const std::string GetGroup() const;
 
 	// 释放实体
 	void KillSelf() const;
@@ -324,7 +325,7 @@ public:
 	bool EntityHasTag(const Entity& entity, const std::string& tag) const;
 
 	// 通过实体获取tag标签
-	const std::string& GetTagByEntity(const Entity& entity) const;
+	const std::string GetTagByEntity(const Entity& entity) const;
 
 	// 通过tag标签获取实体
 	const Entity& GetEntityByTag(const std::string& tag) const;
@@ -342,7 +343,7 @@ public:
 	bool EntityHasGroup(const Entity& entity, const std::string& group) const;
 
 	// 通过实体获取group组名
-	const std::string& GetGroupByEntity(const Entity& entity) const;
+	const std::string GetGroupByEntity(const Entity& entity) const;
 
 	// 通过group组名获取实体集合
 	const std::set<Entity>& GetEntitiesByGroup(const std::string& group) const;
@@ -371,12 +372,15 @@ public:
 	// 获取引擎某一系统
 	template <class TSystem> TSystem& GetSystem() const;
 
-private:
+public:
 	// string转小写
 	static std::string to_lower(std::string str);
 
 	// string转大写
 	static std::string to_upper(std::string str);
+
+	// string判断单词相同
+	static bool is_same_word(const std::string& str1, const std::string& str2);
 
 private:  
 	glm::uint64 numEntities = 0;		// 当前实体数量，同时也代表下一个实体ID

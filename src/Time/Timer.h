@@ -33,7 +33,9 @@ struct Time {
 };
 
 struct Timer {
-    inline static Time time;
+	Timer() = default;
+
+    inline static Time time; // 时间信息
     inline static Uint64 targetFrameTime = 1000 / 60; // 目标帧时长（毫秒）
 
     // 每帧在主循环里调用

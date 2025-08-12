@@ -10,7 +10,6 @@
 
 #include "GameEngine/GameEngine.h"
 
-
 int main(int argc, char* argv[])
 {
 	INIT_LANG;
@@ -18,7 +17,6 @@ int main(int argc, char* argv[])
 	Logger::Instance().Init();
 
 	GameEngine engine;
-	engine.Initialize();
 	engine.Run();
 	engine.Destroy();
 

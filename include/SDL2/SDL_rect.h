@@ -113,6 +113,14 @@ SDL_FORCE_INLINE SDL_bool SDL_PointInRect(const SDL_Point *p, const SDL_Rect *r)
              (p->y >= r->y) && (p->y < (r->y + r->h)) ) ? SDL_TRUE : SDL_FALSE;
 }
 
+SDL_FORCE_INLINE SDL_bool SDL_PointInRectInclusive(const SDL_Point* p, const SDL_Rect* r) {
+    // 使得矩形的边界也被视为内部
+    if (p->x >= r->x && p->x <= r->x + r->w && p->y >= r->y && p->y <= r->y + r->h) {
+        return SDL_TRUE;
+    }
+    return SDL_FALSE;
+}
+
 /**
  * Returns true if the rectangle has no area.
  */

@@ -113,7 +113,11 @@ struct MapStyle
 				std::string value;
 				while (std::getline(ss, value, ',')) 
 				{
-					map[lineNum].push_back(std::stoull(value));
+					std::string indexStr = TrimSpace(value);
+					if(!indexStr.empty())
+					{
+						map[lineNum].push_back(std::stoull(indexStr));
+					}
 				}
 
 				lineNum++;
@@ -129,6 +133,13 @@ struct MapStyle
 			}
 		}
 		file.close();
+	}
+
+private:
+	std::string TrimSpace(const std::string& s)
+	{
+		static const std::regex ws_re("^\\s+|\\s+$");
+		return std::regex_replace(s, ws_re, "");
 	}
 };
 

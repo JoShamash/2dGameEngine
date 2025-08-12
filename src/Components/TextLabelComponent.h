@@ -28,7 +28,7 @@ struct TextLabelComponent{
 	 * @param color 文本颜色
 	 * @param isFixed 渲染方式，是否固定
 	*/
-	TextLabelComponent(glm::i64vec2 position = {0, 0}, std::string text = "", std::string assetId = "", SDL_Color color = {0, 0, 0, 0}, bool isFixed = false)
+	TextLabelComponent(glm::i64vec2 position = {0, 0}, const std::string& text = "", std::string assetId = "", SDL_Color color = {0, 0, 0, 0}, bool isFixed = false)
 		: position(position), text(text), assetId(assetId), color(color), isFixed(isFixed) { }
 };
 

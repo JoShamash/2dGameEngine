@@ -36,6 +36,7 @@
     <ClCompile Include="src\Components\KeyboardControlComponent.h" />
     <ClCompile Include="src\Components\RigidBodyComponent.h" />
     <ClCompile Include="src\ECS\ECS.cpp" />
+    <ClCompile Include="src\LevelLoader\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\GameEngine\GameEngine.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -541,6 +542,7 @@
     <ClInclude Include="src\Components\HealthBarComponent.h" />
     <ClInclude Include="src\Components\ProjectileComponent.h" />
     <ClInclude Include="src\Components\ProjectileEmitterComponent.h" />
+    <ClInclude Include="src\Components\ScriptComponent.h" />
     <ClInclude Include="src\Components\SpriteComponent.h" />
     <ClInclude Include="src\Components\TextLabelComponent.h" />
     <ClInclude Include="src\Components\TransformComponent.h" />
@@ -549,6 +551,8 @@
     <ClInclude Include="src\EventBus\EventBus.h" />
     <ClInclude Include="src\Events\CollisionEvent.h" />
     <ClInclude Include="src\Events\KeyPressedEvent.h" />
+    <ClInclude Include="src\Events\KeyReleasedEvent.h" />
+    <ClInclude Include="src\LevelLoader\LevelLoader.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\GameEngine\GameEngine.h" />
     <ClInclude Include="src\Systems\AnimationSystem.h" />
@@ -566,6 +570,7 @@
     <ClInclude Include="src\Systems\RenderGUISystem.h" />
     <ClInclude Include="src\Systems\RenderHealthBarSystem.h" />
     <ClInclude Include="src\Systems\RenderTextSystem.h" />
+    <ClInclude Include="src\Systems\ScriptSystem.h" />
     <ClInclude Include="src\Time\Timer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -822,6 +827,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>Disabled</Optimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

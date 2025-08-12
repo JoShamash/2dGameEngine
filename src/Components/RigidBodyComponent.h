@@ -18,6 +18,7 @@ struct RigidBodyComponent
 
 
 	double speed;			// 速率，单位：像素/秒
+	double maxSpeed;		// 最大速率，单位：像素/秒	
 	glm::f64vec2 velocity;	// 速度标准化矢量方向
 	
 
@@ -27,7 +28,7 @@ struct RigidBodyComponent
 	* @param velocity 初始速度标准化矢量，默认为(√2/2, √2/2)，始终保证velocity.x^2+velocity.y^2=1
 	*/
 	RigidBodyComponent(double speed = 0, glm::f64vec2 velocity = { glm::one_over_root_two<double>(), glm::one_over_root_two<double>() })
-		: speed(speed), velocity(velocity) { }
+		: speed(speed), maxSpeed(speed), velocity(velocity) { }
 };
 
 #endif // !RIGIDBODYCOMPONENT_H

@@ -101,7 +101,13 @@ public:
 			const auto& transformComponent = entity.GetComponent<TransformComponent>();
 			const auto& rigidBodyComponent = entity.GetComponent<RigidBodyComponent>();
 			const auto& spriteComponent = entity.GetComponent<SpriteComponent>();
-			const auto& campComponent = entity.GetComponent<CampComponent>();
+
+			auto camp = Camp::None;
+			if (entity.HasComponent<CampComponent>())
+			{
+				camp = entity.GetComponent<CampComponent>().camp;
+			}
+
 			const auto& position = transformComponent.position;
 			const auto& size = spriteComponent.size;
 
@@ -116,7 +122,7 @@ public:
 				SpriteComponent spriteComponent1("bullet", { 4, 4 }, RenderLayer::Projectiles);
 				BoxColliderComponent boxColliderComponent1(spriteComponent1.size);
 				ProjectileComponent projectileComponent1(projectileEmitterComponent.projectileDuration, projectileEmitterComponent.hitDamage);
-				CampComponent campComponent1(campComponent.camp);
+				CampComponent campComponent1(camp);
 
 				projectile.AddComponent<TransformComponent>(transformComponent1);
 				projectile.AddComponent<RigidBodyComponent>(rigidBodyComponent1);

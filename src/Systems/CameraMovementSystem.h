@@ -7,6 +7,8 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/CameraFollowComponent.h"
 
+#include <algorithm>
+
 class CameraMovementSystem : public System
 {
 public:
@@ -21,35 +23,93 @@ public:
 
 	void Update(Camera& camera)
 	{
-		for (const auto& entity : GetEntities())
-		{
-			const auto& transformComponent = entity.GetComponent<TransformComponent>();
-			const auto& spriteComponent = entity.GetComponent<SpriteComponent>();
-			const auto& position = transformComponent.position;
+        auto& entities = GetEntities();
+        auto entityNum = entities.size();
 
-			// 更新摄像机位置，使其跟随实体，摄像机位置为实体位置减去摄像机视口宽高的一半
-			camera.x = position.x - (camera.w / 2.0);
-			camera.y = position.y - (camera.h / 2.0);
+        if (entityNum == 1)
+        {
+            auto& entity = entities.front();
+            const auto& transformComponent = entity.GetComponent<TransformComponent>();
+            const auto& position = transformComponent.position;
 
-			// 限制摄像机在地图范围内
-			if (camera.x < 0) 
-			{
-				camera.x = 0;
-			}
-			if (camera.y < 0) 
-			{
-				camera.y = 0;
-			}
-			if (camera.x > GameEngine::mapWidth - camera.w)
-			{
-				camera.x = GameEngine::mapWidth - camera.w;
-			}
-			if (camera.y > GameEngine::mapHeight - camera.h)
-			{
-				camera.y = GameEngine::mapHeight - camera.h;
-			}
+            // 计算目标摄像机位置，使实体居中
+            double targetX = position.x - (camera.w / 2.0f);
+            double targetY = position.y - (camera.h / 2.0f);
 
-		}
+            // 限制目标位置在地图范围内
+            targetX = std::clamp(targetX, 0.0, GameEngine::mapWidth - camera.w);
+            targetY = std::clamp(targetY, 0.0, GameEngine::mapHeight - camera.h);
+
+            if(!camera.isSmoothEnabled())
+            {
+                // 如果未启用平滑，直接设置位置
+                camera.x = targetX;
+                camera.y = targetY;
+                return;
+			}
+            else
+            {
+                // 使用线性插值平滑更新摄像机位置
+				double smoothFactor = camera.getSmoothFactor();
+                camera.x = Lerp(camera.x, targetX, smoothFactor);
+                camera.y = Lerp(camera.y, targetY, smoothFactor);
+            }
+            
+        }
+        else if (entityNum > 1)
+        {
+            // 多人摄像机绑定，类似逻辑，计算所有实体的包围盒中心作为目标位置
+            double minX = std::numeric_limits<double>::max();
+            double minY = std::numeric_limits<double>::max();
+            double maxX = std::numeric_limits<double>::lowest();
+            double maxY = std::numeric_limits<double>::lowest();
+
+            for (const auto& entity : entities)
+            {
+                const auto& transformComponent = entity.GetComponent<TransformComponent>();
+                const auto& position = transformComponent.position;
+
+                if (position.x < minX) minX = position.x;
+                if (position.y < minY) minY = position.y;
+                if (position.x > maxX) maxX = position.x;
+                if (position.y > maxY) maxY = position.y;
+            }
+
+            // 计算包围盒中心
+            double centerX = (minX + maxX) / 2.0;
+            double centerY = (minY + maxY) / 2.0;
+
+            // 计算目标摄像机位置，使包围盒中心居中
+            double targetX = centerX - (camera.w / 2.0);
+            double targetY = centerY - (camera.h / 2.0);
+
+            // 限制目标位置在地图范围内
+            targetX = std::clamp(targetX, 0.0, GameEngine::mapWidth - camera.w);
+            targetY = std::clamp(targetY, 0.0, GameEngine::mapHeight - camera.h);
+
+            if (!camera.isSmoothEnabled())
+            {
+                // 如果未启用平滑，直接设置位置
+                camera.x = targetX;
+                camera.y = targetY;
+                return;
+            }
+            else
+            {
+                // 使用线性插值平滑更新摄像机位置
+                double smoothFactor = camera.getSmoothFactor();
+                camera.x = Lerp(camera.x, targetX, smoothFactor);
+                camera.y = Lerp(camera.y, targetY, smoothFactor);
+            }
+        }
+	}
+
+private:
+	// 线性插值函数
+    template <typename T>
+	T Lerp(T a, T b, float t)
+	{
+		return a + t * (b - a);
 	}
 };
 

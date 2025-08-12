@@ -3,8 +3,8 @@
 
 struct ImageInfo
 {
-	Uint16 width = 0;        // Í¼Æ¬¿í¶È
-	Uint16 height = 0;       // Í¼Æ¬¸ß¶È
+	int width = 0;        // Í¼Æ¬¿í¶È
+	int height = 0;       // Í¼Æ¬¸ß¶È
 };
 
 #endif // !IMAGEINFO_H
